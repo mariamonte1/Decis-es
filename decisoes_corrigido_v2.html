@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DECISÕES — Simulação de Educação Financeira</title>
+<style>
+:root{
+  --azul:#2563eb; --azul-d:#1e40af; --azul-l:#dbeafe;
+  --navy:#0b1a35; --navy2:#12294d;
+  --card:#ffffff; --bg:#f4f7fc; --txt:#0f172a; --mut:#64748b; --line:#e5eaf2;
+  --verde:#0f9d63; --verde-l:#e7f7ef;
+  --amar:#c98a04; --amar-l:#fdf5e1;
+  --verm:#d14343; --verm-l:#fdecec;
+  --rad:18px; --sh:0 12px 34px rgba(8,22,50,.12);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--txt);
+  background:
+    radial-gradient(1100px 620px at 50% -12%, #163b72 0%, transparent 0%),
+    radial-gradient(1100px 620px at 50% -12%, #1d4585 0%, #0b1a35 62%);
+  background-attachment:fixed; min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+#app{max-width:980px;margin:0 auto;padding:20px 16px 70px}
+.fade{animation:fade .45s cubic-bezier(.22,.8,.3,1) both}
+.up{animation:up .5s cubic-bezier(.22,.8,.3,1) both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.94);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.14)}100%{transform:scale(1)}}
+.card{background:var(--card);border-radius:var(--rad);box-shadow:var(--sh);padding:22px}
+h1,h2,h3,h4{margin:0;line-height:1.18;letter-spacing:-.02em}
+p{line-height:1.6}
+.mut{color:var(--mut)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  border:0;cursor:pointer;font:inherit;font-weight:700;letter-spacing:.02em;
+  padding:15px 26px;border-radius:14px;background:var(--azul);color:#fff;
+  transition:transform .15s, box-shadow .2s, background .2s; box-shadow:0 8px 22px rgba(37,99,235,.32);
+}
+.btn:hover{transform:translateY(-2px);background:var(--azul-d)}
+.btn:active{transform:translateY(0)}
+.btn[disabled]{background:#c3cddd;color:#fff;cursor:not-allowed;box-shadow:none;transform:none}
+.btn.ghost{background:transparent;color:var(--azul);box-shadow:none;border:1.5px solid var(--line)}
+.btn.ghost:hover{background:#f2f6fd;color:var(--azul-d)}
+.btn.lg{padding:18px 40px;font-size:1.05rem;width:100%;max-width:420px}
+.btn.dark{background:#0f2547;box-shadow:0 8px 22px rgba(0,0,0,.3)}
+.center{text-align:center}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* ---------- CAPA ---------- */
+.hero{color:#fff;text-align:center;padding:34px 10px 10px}
+.hero .kicker{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.22em;
+  color:#a9c6ff;border:1px solid rgba(169,198,255,.35);padding:7px 14px;border-radius:99px;margin-bottom:22px}
+.hero h1{font-size:clamp(2.4rem,8vw,4.2rem);font-weight:900}
+.hero h1 span{background:linear-gradient(90deg,#7fb0ff,#dbe9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .sub{font-size:clamp(1rem,2.6vw,1.22rem);color:#c7d8f5;margin:14px auto 4px;max-width:600px;line-height:1.55}
+.hero .frase{color:#8fb2e8;font-style:italic;margin-top:18px;font-size:.98rem}
+.heroart{margin:6px auto 20px;max-width:440px}
+.pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 6px}
+.pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#d5e4fb;
+  padding:9px 15px;border-radius:99px;font-size:.82rem;font-weight:600}
+
+/* ---------- PERFIS ---------- */
+.sechead{color:#fff;text-align:center;margin:6px 0 26px}
+.sechead h2{font-size:clamp(1.5rem,4.4vw,2.1rem);font-weight:800}
+.sechead p{color:#a7c0e6;margin:10px 0 0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.perfil{background:var(--card);border-radius:var(--rad);box-shadow:var(--sh);overflow:hidden;
+  display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;border-top:5px solid var(--azul)}
+.perfil:hover{transform:translateY(-5px);box-shadow:0 20px 44px rgba(8,22,50,.2)}
+.perfil .top{padding:18px 20px 6px;display:flex;gap:14px;align-items:center}
+.perfil .ava{width:70px;height:70px;flex:0 0 70px}
+.perfil h3{font-size:1.12rem}
+.perfil .tag{font-size:.7rem;font-weight:800;letter-spacing:.12em;color:var(--azul);text-transform:uppercase}
+.perfil .desc{padding:4px 20px 0;color:var(--mut);font-size:.93rem;line-height:1.55;min-height:56px}
+.perfil .nums{margin:14px 20px;background:#f7f9fd;border-radius:12px;padding:12px 14px;display:grid;gap:7px}
+.perfil .nums div{display:flex;justify-content:space-between;font-size:.86rem}
+.perfil .nums b{font-variant-numeric:tabular-nums}
+.perfil .goal{margin:0 20px 12px;font-size:.86rem;color:var(--txt);background:var(--azul-l);
+  border-radius:10px;padding:10px 12px;line-height:1.45}
+.perfil .act{padding:0 20px 20px;margin-top:auto}
+.perfil .act .btn{width:100%}
+
+/* ---------- HUD ---------- */
+.hud{position:sticky;top:0;z-index:30;background:rgba(9,24,50,.86);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:12px 14px;margin-bottom:18px;color:#fff}
+.hud .l1{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.hud .mes{font-size:.74rem;font-weight:800;letter-spacing:.16em;color:#9dbdf0}
+.hud .pf{font-size:.74rem;font-weight:700;color:#c9dcfa;background:rgba(255,255,255,.09);padding:5px 11px;border-radius:99px}
+.dots{display:flex;gap:6px;align-items:center;margin-bottom:12px}
+.dots i{height:6px;flex:1;border-radius:99px;background:rgba(255,255,255,.16);transition:background .4s}
+.dots i.on{background:linear-gradient(90deg,#4f8ff7,#8ab6ff)}
+.dots i.now{background:#fff;box-shadow:0 0 12px rgba(255,255,255,.7)}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.chip{background:rgba(255,255,255,.07);border-radius:11px;padding:9px 10px;min-width:0}
+.chip .k{font-size:.66rem;color:#9fb9de;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip .v{font-size:.98rem;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px;white-space:nowrap}
+.chip.g .v{color:#5fe0a8} .chip.r .v{color:#ff9a9a} .chip.y .v{color:#ffd479}
+.chip .bar{height:4px;border-radius:99px;background:rgba(255,255,255,.16);margin-top:6px;overflow:hidden}
+.chip .bar b{display:block;height:100%;background:#5fe0a8;border-radius:99px;transition:width .7s cubic-bezier(.22,.8,.3,1)}
+.chip.flash{animation:pulse .5s ease}
+.extra{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.extra span{font-size:.74rem;background:rgba(255,255,255,.07);color:#d7e5fa;padding:6px 10px;border-radius:99px}
+
+/* ---------- CENAS ---------- */
+.scene{padding:26px}
+.scene .tag{display:inline-block;font-size:.68rem;font-weight:900;letter-spacing:.18em;
+  color:var(--azul);background:var(--azul-l);padding:6px 12px;border-radius:99px;margin-bottom:14px}
+.scene .tag.ev{color:var(--amar);background:var(--amar-l)}
+.scene .tag.al{color:var(--verm);background:var(--verm-l)}
+.scene h2{font-size:clamp(1.35rem,4vw,1.75rem);margin-bottom:12px}
+.scene .txt{color:#334155;font-size:1.02rem;line-height:1.68;margin:0 0 6px}
+.ilu{width:100%;max-width:150px;height:auto;display:block}
+.ilubox{float:right;margin:0 0 10px 18px;background:#f4f7fd;border-radius:16px;padding:14px;width:170px}
+.opts{display:grid;gap:12px;margin-top:22px}
+.opt{display:flex;gap:14px;align-items:flex-start;text-align:left;width:100%;
+  background:#fff;border:2px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer;
+  font:inherit;transition:border-color .18s,transform .18s,box-shadow .18s,background .18s}
+.opt:hover{border-color:#a9c5f6;transform:translateY(-2px);box-shadow:0 10px 24px rgba(37,99,235,.12)}
+.opt .letra{flex:0 0 34px;height:34px;border-radius:10px;background:#f0f4fc;color:var(--azul);
+  display:flex;align-items:center;justify-content:center;font-weight:900}
+.opt .tt{font-weight:700;font-size:1.02rem;line-height:1.35}
+.opt .dd{color:var(--mut);font-size:.9rem;margin-top:4px}
+.opt.sel{border-color:var(--azul);background:#f5f9ff;box-shadow:0 10px 26px rgba(37,99,235,.16)}
+.opt.sel .letra{background:var(--azul);color:#fff}
+.opt.off{opacity:.42;pointer-events:none}
+.warn{display:inline-block;margin-top:7px;font-size:.74rem;font-weight:700;color:var(--amar);
+  background:var(--amar-l);padding:4px 9px;border-radius:99px}
+.warn.red{color:var(--verm);background:var(--verm-l)}
+.acts{margin-top:22px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* ---------- EXTRATO ---------- */
+.extrato{margin-top:18px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.extrato .h{background:#f7f9fd;padding:11px 16px;font-size:.72rem;font-weight:800;letter-spacing:.14em;color:var(--mut)}
+.extrato .it{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid var(--line);font-size:.94rem}
+.extrato .it b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.pos{color:var(--verde)} .neg{color:var(--verm)} .neu{color:var(--mut)}
+.extrato .tot{display:flex;justify-content:space-between;padding:13px 16px;border-top:2px solid var(--line);background:#fbfcfe;font-weight:800}
+
+/* ---------- CONSEQUÊNCIA ---------- */
+.conseq{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin:20px 0}
+.snap{background:#f7f9fd;border-radius:14px;padding:16px;text-align:center}
+.snap .k{font-size:.66rem;letter-spacing:.16em;font-weight:800;color:var(--mut)}
+.snap .v{font-size:1.5rem;font-weight:900;margin-top:6px;font-variant-numeric:tabular-nums}
+.snap.after{background:var(--azul-l)}
+.arrow{font-size:1.5rem;color:var(--azul);font-weight:900}
+.deltas{display:grid;gap:8px;margin-top:6px}
+.delta{display:flex;justify-content:space-between;background:#f7f9fd;border-radius:11px;padding:11px 14px;font-size:.92rem}
+.delta b{font-variant-numeric:tabular-nums}
+.lesson{margin-top:20px;border-left:4px solid var(--azul);background:#f6f9ff;border-radius:0 12px 12px 0;padding:16px 18px}
+.lesson .k{font-size:.68rem;font-weight:900;letter-spacing:.16em;color:var(--azul);margin-bottom:7px}
+.lesson p{margin:0;color:#334155;font-size:.97rem;line-height:1.65}
+
+/* ---------- FECHAMENTO ---------- */
+.alloc{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.pot{background:#f7f9fd;border-radius:14px;padding:14px;text-align:center;transition:background .3s}
+.pot .k{font-size:.68rem;color:var(--mut);font-weight:800;letter-spacing:.06em}
+.pot .v{font-size:1.12rem;font-weight:900;margin-top:5px;font-variant-numeric:tabular-nums}
+.pot.on{background:var(--azul-l)}
+.mover{background:#fbfcff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:6px}
+.mover input{width:100%;padding:14px;border:2px solid var(--line);border-radius:12px;font:inherit;
+  font-size:1.15rem;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+.mover input:focus{outline:0;border-color:var(--azul)}
+.quick{display:flex;gap:8px;margin:10px 0}
+.quick button{flex:1;background:#eef3fc;border:0;border-radius:10px;padding:9px;font:inherit;
+  font-weight:700;font-size:.84rem;color:var(--azul);cursor:pointer}
+.quick button:hover{background:#e0eafc}
+.dest{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.dest button{background:#fff;border:2px solid var(--line);border-radius:12px;padding:13px 10px;font:inherit;
+  font-weight:700;font-size:.88rem;cursor:pointer;transition:border-color .2s,background .2s}
+.dest button:hover{border-color:var(--azul);background:#f5f9ff}
+.dest button[disabled]{opacity:.4;pointer-events:none}
+.hist{margin-top:14px;font-size:.86rem;color:var(--mut)}
+
+/* ---------- FINAL ---------- */
+.final-hero{color:#fff;text-align:center;margin-bottom:24px}
+.final-hero h2{font-size:clamp(1.8rem,6vw,2.8rem);font-weight:900}
+.final-hero p{color:#a9c4ea;margin-top:8px}
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.res .b{background:#fff;border-radius:14px;padding:16px;box-shadow:var(--sh)}
+.res .b .k{font-size:.68rem;font-weight:800;letter-spacing:.1em;color:var(--mut)}
+.res .b .v{font-size:1.32rem;font-weight:900;margin-top:6px;font-variant-numeric:tabular-nums}
+.diag{border-radius:var(--rad);padding:26px;color:#fff;box-shadow:var(--sh);margin:18px 0}
+.diag .k{font-size:.7rem;font-weight:900;letter-spacing:.2em;opacity:.85}
+.diag h3{font-size:clamp(1.7rem,6vw,2.4rem);font-weight:900;margin:8px 0 10px}
+.diag p{margin:0;opacity:.94;line-height:1.6}
+.score{display:flex;align-items:center;gap:16px;margin-top:20px;background:rgba(255,255,255,.14);border-radius:14px;padding:14px 18px}
+.score .n{font-size:2.2rem;font-weight:900;line-height:1}
+.score .bar{flex:1;height:9px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden}
+.score .bar b{display:block;height:100%;background:#fff;border-radius:99px;transition:width 1.1s cubic-bezier(.22,.8,.3,1)}
+.pontos{display:grid;gap:10px;margin-top:8px}
+.ponto{display:flex;gap:11px;background:#f7f9fd;border-radius:12px;padding:13px 15px;font-size:.94rem;line-height:1.55}
+.chips2{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.chips2 button{background:#f2f6fd;border:2px solid transparent;border-radius:11px;padding:11px 14px;
+  font:inherit;font-size:.86rem;cursor:pointer;text-align:left;max-width:100%}
+.chips2 button:hover{border-color:var(--azul)}
+.chips2 button.sel{border-color:var(--azul);background:#fff}
+.chips2 button small{display:block;color:var(--mut);margin-top:3px}
+
+@media(max-width:720px){
+  #app{padding:14px 12px 60px}
+  .grid,.res,.alloc{grid-template-columns:1fr}
+  .res{grid-template-columns:repeat(2,1fr)}
+  .alloc{grid-template-columns:repeat(2,1fr)}
+  .chips{grid-template-columns:repeat(2,1fr)}
+  .scene{padding:20px 17px}
+  .card{padding:18px}
+  .ilubox{float:none;margin:0 auto 16px;width:120px}
+  .conseq{grid-template-columns:1fr;gap:8px}
+  .arrow{transform:rotate(90deg);text-align:center}
+  .dest{grid-template-columns:1fr}
+  .btn{width:100%}
+  .acts .btn.ghost{width:auto}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+"use strict";
+/* =====================================================================================
+   1) CONFIGURAÇÃO CENTRAL — altere aqui valores, perfis, rendas, despesas e regras
+   ===================================================================================== */
+const CONFIG = {
+  renda: 2000,
+  internet: 57.90,
+  jurosDivida: 0.07,     // juros mensais sobre o saldo devedor
+  rendReserva: 0.004,    // rendimento mensal da reserva
+  rendInvest:  0.009,    // rendimento mensal dos investimentos
+  meses: 6,
+  mesesInfo: [
+    {n:1, titulo:'O COMEÇO',                        tema:'Organização financeira'},
+    {n:2, titulo:'VOCÊ JÁ TEM COMPROMISSOS',        tema:'Consumo, crédito e parcelamento'},
+    {n:3, titulo:'O DINHEIRO NÃO ESQUECE',          tema:'Liquidez, oportunidades e manutenção'},
+    {n:4, titulo:'NEM TUDO ACONTECE QUANDO VOCÊ ESPERA', tema:'Consequências e imprevistos'},
+    {n:5, titulo:'EU MEREÇO',                       tema:'Desejo, recompensa e prioridade'},
+    {n:6, titulo:'AGORA É COM VOCÊ',                tema:'Decisão de longo prazo'}
+  ],
+  perfis:{
+    p1:{ id:'p1', nome:'PRIMEIRO PASSO', tag:'Mora com a família', cor:'#2563eb', ava:'ava1',
+      desc:'Está começando a administrar o próprio dinheiro e sente que sobra bastante todo mês.',
+      dinheiro:500, reserva:0, invest:0, divida:0, vr:0, parcelaMinima:150,
+      despesas:[{nome:'Ajuda em casa',valor:250},{nome:'Transporte',valor:200}],
+      objetivo:{label:'Reserva de R$ 3.000', meta:3000, tipo:'reserva'},
+      desafio:'Consumo e a sensação de que existe muito dinheiro disponível.' },
+    p2:{ id:'p2', nome:'INDEPENDÊNCIA', tag:'Mora sozinho(a)', cor:'#0f9d63', ava:'ava2',
+      desc:'Mora sozinho(a), paga todas as contas e tem pouca margem para erros.',
+      dinheiro:700, reserva:300, invest:0, divida:0, vr:500, parcelaMinima:150,
+      despesas:[{nome:'Aluguel',valor:650},{nome:'Energia',valor:100},{nome:'Água',valor:50},{nome:'Transporte',valor:200}],
+      objetivo:{label:'Reserva de R$ 2.500', meta:2500, tipo:'reserva'},
+      desafio:'Custo de vida alto, organização do VR e pouca folga.' },
+    p3:{ id:'p3', nome:'RECOMEÇO', tag:'Começa com dívida', cor:'#d14343', ava:'ava3',
+      desc:'Começa a jornada devendo R$ 1.500 e pagando parcela mínima todo mês.',
+      dinheiro:300, reserva:100, invest:0, divida:1500, vr:0, parcelaMinima:250,
+      despesas:[{nome:'Transporte',valor:250},{nome:'Alimentação',valor:400}],
+      objetivo:{label:'Quitar a dívida + R$ 1.000 de reserva', meta:1000, tipo:'quitar', dividaInicial:1500},
+      desafio:'Crédito, juros e o ciclo do endividamento.' },
+    p4:{ id:'p4', nome:'OBJETIVO MAIOR', tag:'Meta específica', cor:'#7c3aed', ava:'ava4',
+      desc:'Mora com a família e quer juntar R$ 5.000 para realizar um projeto pessoal.',
+      dinheiro:1500, reserva:500, invest:0, divida:0, vr:0, parcelaMinima:150,
+      despesas:[{nome:'Ajuda em casa',valor:300},{nome:'Transporte',valor:200},{nome:'Alimentação',valor:250}],
+      objetivo:{label:'Juntar R$ 5.000 para o projeto', meta:5000, tipo:'reserva'},
+      desafio:'Equilibrar objetivo, consumo e segurança.' }
+  }
+};
+
+/* ===================== UTILITÁRIOS ===================== */
+const app = document.getElementById('app');
+const r2 = v => Math.round((v + Number.EPSILON)*100)/100;
+const fmt = v => 'R$ ' + r2(Math.abs(v)).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const sgn = v => (v>=0?'+ ':'− ') + fmt(v);
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const esc = s => String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+/* ===================== ILUSTRAÇÕES SVG ===================== */
+const ILU = {
+  ava1:`<svg class="ava" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="#dbeafe"/><circle cx="40" cy="32" r="13" fill="#2563eb"/><path d="M16 70c2-14 12-21 24-21s22 7 24 21z" fill="#1e40af"/><circle cx="60" cy="20" r="9" fill="#93c5fd"/><path d="M56 20h8M60 16v8" stroke="#1e40af" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  ava2:`<svg class="ava" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="#dcfce7"/><circle cx="40" cy="32" r="13" fill="#0f9d63"/><path d="M16 70c2-14 12-21 24-21s22 7 24 21z" fill="#0b7a4c"/><path d="M50 22l10-8 10 8v11H50z" fill="#86efac"/><rect x="57" y="26" width="6" height="7" fill="#0b7a4c"/></svg>`,
+  ava3:`<svg class="ava" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="#fee2e2"/><circle cx="40" cy="32" r="13" fill="#d14343"/><path d="M16 70c2-14 12-21 24-21s22 7 24 21z" fill="#a52f2f"/><rect x="48" y="14" width="24" height="15" rx="3" fill="#fca5a5"/><rect x="48" y="19" width="24" height="4" fill="#a52f2f"/></svg>`,
+  ava4:`<svg class="ava" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="#ede9fe"/><circle cx="40" cy="32" r="13" fill="#7c3aed"/><path d="M16 70c2-14 12-21 24-21s22 7 24 21z" fill="#5b21b6"/><circle cx="61" cy="21" r="10" fill="#c4b5fd"/><circle cx="61" cy="21" r="4" fill="#5b21b6"/></svg>`,
+  capa:`<svg viewBox="0 0 420 200" style="width:100%;height:auto">
+    <rect x="20" y="120" width="60" height="60" rx="8" fill="#1d4ed8"/><rect x="95" y="95" width="60" height="85" rx="8" fill="#3b82f6"/>
+    <rect x="170" y="60" width="60" height="120" rx="8" fill="#60a5fa"/><rect x="245" y="35" width="60" height="145" rx="8" fill="#93c5fd"/>
+    <path d="M30 105 L120 78 L200 48 L275 22" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/>
+    <circle cx="275" cy="22" r="8" fill="#fff"/>
+    <circle cx="355" cy="70" r="34" fill="#facc15"/><text x="355" y="82" font-size="34" font-weight="900" text-anchor="middle" fill="#78500a">R$</text>
+    <rect x="320" y="130" width="70" height="50" rx="8" fill="#1e3a8a"/><rect x="330" y="146" width="50" height="6" rx="3" fill="#93c5fd"/>
+  </svg>`,
+  internet:`<svg class="ilu" viewBox="0 0 120 100"><rect x="44" y="34" width="32" height="56" rx="6" fill="#1d4ed8"/><rect x="49" y="40" width="22" height="40" rx="2" fill="#dbeafe"/><path d="M30 34a42 42 0 0 1 60 0" stroke="#60a5fa" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M40 46a26 26 0 0 1 40 0" stroke="#93c5fd" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="60" cy="86" r="3" fill="#dbeafe"/></svg>`,
+  celular:`<svg class="ilu" viewBox="0 0 120 100"><rect x="38" y="12" width="44" height="78" rx="9" fill="#1d4ed8"/><rect x="43" y="20" width="34" height="58" rx="3" fill="#dbeafe"/><rect x="53" y="15" width="14" height="3" rx="1.5" fill="#93c5fd"/><circle cx="60" cy="84" r="3.5" fill="#93c5fd"/><path d="M50 40l8 8 14-16" stroke="#2563eb" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  cofre:`<svg class="ilu" viewBox="0 0 120 100"><rect x="20" y="18" width="80" height="66" rx="10" fill="#1d4ed8"/><rect x="28" y="26" width="64" height="50" rx="6" fill="#dbeafe"/><circle cx="60" cy="51" r="16" fill="#fff" stroke="#2563eb" stroke-width="4"/><path d="M60 41v20M50 51h20" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/><rect x="30" y="84" width="8" height="10" fill="#1e3a8a"/><rect x="82" y="84" width="8" height="10" fill="#1e3a8a"/></svg>`,
+  cartao:`<svg class="ilu" viewBox="0 0 120 100"><rect x="14" y="26" width="92" height="56" rx="8" fill="#1d4ed8"/><rect x="14" y="40" width="92" height="11" fill="#0f2547"/><rect x="24" y="60" width="22" height="14" rx="3" fill="#facc15"/><rect x="56" y="65" width="42" height="5" rx="2.5" fill="#93c5fd"/></svg>`,
+  casa:`<svg class="ilu" viewBox="0 0 120 100"><rect x="26" y="44" width="68" height="44" rx="5" fill="#dbeafe"/><path d="M18 46 L60 14 L102 46 Z" fill="#2563eb"/><rect x="52" y="62" width="18" height="26" rx="2" fill="#1d4ed8"/><rect x="34" y="54" width="13" height="12" rx="2" fill="#93c5fd"/><rect x="75" y="54" width="13" height="12" rx="2" fill="#93c5fd"/></svg>`,
+  manutencao:`<svg class="ilu" viewBox="0 0 120 100"><path d="M78 22a18 18 0 0 0-24 22L26 72a8 8 0 0 0 11 11l28-28a18 18 0 0 0 22-24l-11 11-9-2-2-9z" fill="#2563eb"/><circle cx="34" cy="76" r="4" fill="#dbeafe"/><path d="M92 74l12 12" stroke="#93c5fd" stroke-width="7" stroke-linecap="round"/></svg>`,
+  compras:`<svg class="ilu" viewBox="0 0 120 100"><path d="M20 24h14l12 42h44" stroke="#1d4ed8" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="40" y="30" width="58" height="28" rx="4" fill="#60a5fa"/><circle cx="52" cy="80" r="7" fill="#1e3a8a"/><circle cx="86" cy="80" r="7" fill="#1e3a8a"/></svg>`,
+  invest:`<svg class="ilu" viewBox="0 0 120 100"><rect x="18" y="60" width="18" height="28" rx="3" fill="#93c5fd"/><rect x="44" y="46" width="18" height="42" rx="3" fill="#60a5fa"/><rect x="70" y="30" width="18" height="58" rx="3" fill="#2563eb"/><path d="M24 50l22-14 22 -8 22-16" stroke="#0f9d63" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="96" cy="14" r="7" fill="#0f9d63"/></svg>`,
+  alerta:`<svg class="ilu" viewBox="0 0 120 100"><path d="M60 14 L108 88 H12 Z" fill="#fbbf24"/><rect x="55" y="40" width="10" height="26" rx="5" fill="#7c4a03"/><circle cx="60" cy="76" r="6" fill="#7c4a03"/></svg>`,
+  moto:`<svg class="ilu" viewBox="0 0 120 100"><circle cx="28" cy="70" r="16" fill="none" stroke="#1d4ed8" stroke-width="6"/><circle cx="92" cy="70" r="16" fill="none" stroke="#1d4ed8" stroke-width="6"/><path d="M28 70l18-24h22l14 24" stroke="#2563eb" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M44 46h26" stroke="#60a5fa" stroke-width="6" stroke-linecap="round"/><path d="M70 34h14" stroke="#93c5fd" stroke-width="5" stroke-linecap="round"/></svg>`,
+  viagem:`<svg class="ilu" viewBox="0 0 120 100"><rect x="26" y="36" width="68" height="50" rx="8" fill="#2563eb"/><rect x="26" y="52" width="68" height="8" fill="#1e3a8a"/><path d="M48 36V26a6 6 0 0 1 6-6h12a6 6 0 0 1 6 6v10" stroke="#93c5fd" stroke-width="6" fill="none"/></svg>`,
+  comida:`<svg class="ilu" viewBox="0 0 120 100"><circle cx="60" cy="52" r="30" fill="#dbeafe"/><circle cx="60" cy="52" r="18" fill="#60a5fa"/><rect x="14" y="24" width="5" height="56" rx="2.5" fill="#1d4ed8"/><rect x="24" y="24" width="5" height="26" rx="2.5" fill="#1d4ed8"/><rect x="100" y="24" width="6" height="56" rx="3" fill="#1d4ed8"/></svg>`,
+  presente:`<svg class="ilu" viewBox="0 0 120 100"><rect x="22" y="42" width="76" height="46" rx="6" fill="#2563eb"/><rect x="22" y="32" width="76" height="16" rx="5" fill="#60a5fa"/><rect x="53" y="32" width="14" height="56" fill="#facc15"/><path d="M60 32c-10-16-26-6-14 0M60 32c10-16 26-6 14 0" fill="#facc15"/></svg>`,
+  trabalho:`<svg class="ilu" viewBox="0 0 120 100"><rect x="18" y="36" width="84" height="50" rx="8" fill="#1d4ed8"/><rect x="46" y="24" width="28" height="12" rx="4" fill="#60a5fa"/><rect x="18" y="56" width="84" height="6" fill="#0f2547"/><rect x="52" y="52" width="16" height="14" rx="3" fill="#facc15"/></svg>`,
+  trofeu:`<svg class="ilu" viewBox="0 0 120 100"><path d="M38 16h44v22a22 22 0 0 1-44 0z" fill="#facc15"/><path d="M38 22H26v8a14 14 0 0 0 12 13M82 22h12v8a14 14 0 0 1-12 13" stroke="#eab308" stroke-width="5" fill="none"/><rect x="52" y="58" width="16" height="16" fill="#eab308"/><rect x="38" y="74" width="44" height="12" rx="4" fill="#1d4ed8"/></svg>`
+};
+
+/* ===================== ESTADO ===================== */
+let state = null;
+const SAVE_KEY = 'decisoes_save_v1';
+
+function novoEstado(perfilId){
+  const p = CONFIG.perfis[perfilId];
+  return {
+    perfilId, mes:1,
+    dinheiro:p.dinheiro, reserva:p.reserva, invest:p.invest, divida:p.divida, vr:0,
+    despesas: p.despesas.map(d=>({...d})),
+    parcelas: [],
+    flags:{},
+    historico:[],
+    serie:[{mes:0, reserva:p.reserva, invest:p.invest, dinheiro:p.dinheiro, divida:p.divida,
+            patrimonio: p.dinheiro+p.reserva+p.invest-p.divida}],
+    extrato:[], cenaIdx:0
+  };
+}
+const perfil = () => CONFIG.perfis[state.perfilId];
+function sane(){ ['dinheiro','reserva','invest','divida','vr'].forEach(k=>state[k]=r2(state[k])); }
+function salvar(){ try{ const {cenas,...s}=state; localStorage.setItem(SAVE_KEY, JSON.stringify(s)); }catch(e){} }
+function limparSave(){ try{ localStorage.removeItem(SAVE_KEY);}catch(e){} }
+
+/* ===================== MOTOR FINANCEIRO ===================== */
+function pagar(st, valor, desc){
+  let falta = valor, det = [];
+  const d = Math.min(Math.max(st.dinheiro,0), falta);
+  st.dinheiro -= d; falta -= d; if(d>0.005) det.push(fmt(d)+' do dinheiro disponível');
+  if(falta>0.005){ const r=Math.min(st.reserva,falta); st.reserva-=r; falta-=r;
+    if(r>0.005){ det.push(fmt(r)+' da reserva'); st.flags.usouReserva=true; } }
+  if(falta>0.005 && !st.flags.investBloqueado){ const i=Math.min(st.invest,falta); st.invest-=i; falta-=i;
+    if(i>0.005){ det.push(fmt(i)+' resgatado do investimento'); st.flags.resgatou=true; } }
+  if(falta>0.005){ st.divida+=falta; st.flags.usouCredito=true;
+    st.flags.qtdCredito=(st.flags.qtdCredito||0)+1; det.push(fmt(falta)+' no crédito (virou dívida)'); }
+  sane();
+  return { texto: det.length? ('Origem do pagamento: '+det.join(' + ')+'.') : '' };
+}
+function addParcela(st, nome, valor, total){
+  st.dinheiro -= valor;                     // 1ª parcela cobrada no ato
+  st.parcelas.push({nome, valor, total, restantes: total-1});
+  st.flags.parcelou = (st.flags.parcelou||0)+1;
+  equilibrarSilencioso(st); sane();
+}
+function equilibrarSilencioso(st){
+  if(st.dinheiro < -0.005){
+    let falta=-st.dinheiro; st.dinheiro=0;
+    const r=Math.min(st.reserva,falta); st.reserva-=r; falta-=r; if(r>0) st.flags.usouReserva=true;
+    if(falta>0.005){ st.divida+=falta; st.flags.usouCredito=true; }
+  }
+}
+const parcelasMensais = st => st.parcelas.reduce((a,p)=>a+(p.restantes>0?p.valor:0),0);
+const compromissosFuturos = st => st.parcelas.reduce((a,p)=>a+p.valor*p.restantes,0);
+const despesasFixas = st => st.despesas.reduce((a,d)=>a+d.valor,0);
+function custoMensalTotal(st){
+  let t = despesasFixas(st) + parcelasMensais(st);
+  if(st.divida>0) t += Math.min(st.divida, Math.max(perfil().parcelaMinima, st.divida*0.12));
+  if(perfil().vr) t += Math.max(0,(st.flags.consumoAlim ?? 470) - perfil().vr);
+  return t;
+}
+function progressoObjetivo(st){
+  const o = perfil().objetivo;
+  if(st.flags.objetivoRealizado) return 1;
+  if(o.tipo==='quitar'){
+    const dv = clamp(1 - st.divida/o.dividaInicial, 0, 1);
+    const rs = clamp((st.reserva+st.invest)/o.meta, 0, 1);
+    return clamp(dv*0.6 + rs*0.4, 0, 1);
+  }
+  return clamp((st.reserva+st.invest)/o.meta, 0, 1);
+}
+const patrimonio = st => r2(st.dinheiro+st.reserva+st.invest-st.divida);
+
+/* ===================== PROCESSAMENTO DO MÊS ===================== */
+function processarMes(){
+  const st = state, p = perfil(), ex = [];
+  st.dinheiro += CONFIG.renda;
+  ex.push({l:'Renda líquida do mês', t:'+ '+fmt(CONFIG.renda), c:'pos'});
+
+  if(p.vr){ st.vr += p.vr; ex.push({l:'Crédito do vale-refeição (VR)', t:'+ '+fmt(p.vr)+' no VR', c:'neu'}); }
+
+  if(st.reserva>0){ const r=r2(st.reserva*CONFIG.rendReserva); st.reserva+=r;
+    if(r>=0.01) ex.push({l:'Rendimento da reserva', t:'+ '+fmt(r)+' na reserva', c:'pos'}); }
+  if(st.invest>0){ const r=r2(st.invest*CONFIG.rendInvest); st.invest+=r;
+    if(r>=0.01) ex.push({l:'Rendimento dos investimentos', t:'+ '+fmt(r)+' investidos', c:'pos'}); }
+
+  st.despesas.forEach(d=>{ st.dinheiro-=d.valor; ex.push({l:d.nome, t:'− '+fmt(d.valor), c:'neg'}); });
+
+  if(p.vr){
+    const cons = st.flags.consumoAlim ?? 470;
+    const doVr = Math.min(st.vr, cons); st.vr -= doVr;
+    ex.push({l:'Alimentação paga com VR', t:'− '+fmt(doVr)+' do VR', c:'neu'});
+    const falta = r2(cons - doVr);
+    if(falta>0.01){ st.dinheiro-=falta; ex.push({l:'Alimentação além do VR (dinheiro)', t:'− '+fmt(falta), c:'neg'}); }
+  }
+
+  st.parcelas.forEach(pc=>{
+    if(pc.restantes>0){ st.dinheiro-=pc.valor; pc.restantes--;
+      ex.push({l:'Parcela: '+pc.nome+' ('+(pc.total-pc.restantes)+'/'+pc.total+')', t:'− '+fmt(pc.valor), c:'neg'}); }
+  });
+  st.parcelas = st.parcelas.filter(pc=>pc.restantes>0);
+
+  if(st.divida>0.01){
+    const j = r2(st.divida*CONFIG.jurosDivida); st.divida += j;
+    ex.push({l:'Juros sobre a dívida ('+(CONFIG.jurosDivida*100).toFixed(0)+'% a.m.)', t:'+ '+fmt(j)+' de dívida', c:'neg'});
+    const min = r2(Math.min(st.divida, Math.max(p.parcelaMinima, st.divida*0.12)));
+    st.dinheiro -= min; st.divida -= min;
+    ex.push({l:'Pagamento da dívida (parcela mínima)', t:'− '+fmt(min), c:'neg'});
+  }
+
+  if(st.dinheiro < -0.005){
+    let falta = -st.dinheiro; st.dinheiro = 0;
+    const r = Math.min(st.reserva, falta); st.reserva -= r; falta -= r;
+    if(r>0.005){ ex.push({l:'Retirada automática da reserva para fechar o mês', t:'− '+fmt(r)+' da reserva', c:'neg'}); st.flags.usouReserva=true; }
+    if(falta>0.005){ st.divida += falta; st.flags.usouCredito=true; st.flags.mesNegativo=(st.flags.mesNegativo||0)+1;
+      ex.push({l:'Faltou dinheiro: uso de crédito emergencial', t:'+ '+fmt(falta)+' de dívida', c:'neg'}); }
+  }
+  sane();
+  st.extrato = ex;
+}
+
+/* =====================================================================================
+   2) ROTEIRO — cenários, decisões, consequências e explicações (editável por perfil/mês)
+   ===================================================================================== */
+function cenaInternet(){
+  return {tipo:'decisao', ilu:'internet', tag:'DECISÃO', titulo:'Internet móvel na sua rotina',
+    texto:'Você depende do celular para transporte, mensagens, trabalho e estudo. Um plano de internet móvel custa <b>R$ 57,90 por mês</b>, cobrado automaticamente todos os meses.',
+    opcoes:[
+      {id:'A', titulo:'Contratar o plano', detalhe:'R$ 57,90 por mês, a partir do próximo mês', aplicar(st){
+        st.flags.internet=true; st.despesas.push({nome:'Internet móvel', valor:CONFIG.internet});
+        return {msg:'Plano contratado. R$ 57,90 passam a sair automaticamente todos os meses.',
+          exp:'Gastos recorrentes são pequenos por mês e grandes por ano: R$ 57,90 × 12 = R$ 694,80. Eles não pedem sua autorização de novo — reduzem sua margem de decisão em todos os meses seguintes.'};}},
+      {id:'B', titulo:'Não contratar agora', detalhe:'R$ 0 por mês', aplicar(st){
+        st.flags.semInternet=true;
+        return {msg:'Você seguiu sem plano de internet móvel e manteve o custo fixo mais baixo.',
+          exp:'Você preservou R$ 57,90 de folga mensal. Em contrapartida, abriu mão de conveniência e de algumas oportunidades que dependem de estar conectado fora de casa.'};}}
+    ]};
+}
+function cenaCelular(texto){
+  return {tipo:'decisao', ilu:'celular', tag:'DECISÃO PRINCIPAL', titulo:'Seu celular está no limite',
+    texto: texto,
+    opcoes:[
+      {id:'A', titulo:'Comprar o novo à vista', detalhe:'R$ 1.500 agora', custo:1500, aplicar(st){
+        const f=pagar(st,1500,'Celular'); st.flags.celularNovo=true;
+        return {msg:'Celular comprado à vista por R$ 1.500. '+f.texto,
+          exp:'À vista você paga o menor valor total e não compromete os meses seguintes. Em troca, sua liquidez cai de uma vez: o dinheiro que absorveria um imprevisto agora está dentro do aparelho.'};}},
+      {id:'B', titulo:'Parcelar em 6 vezes', detalhe:'6 × R$ 280 = R$ 1.680', aplicar(st){
+        addParcela(st,'Celular',280,6); st.flags.celularNovo=true; st.flags.parcelouCelular=true;
+        return {msg:'Compra parcelada. A 1ª parcela de R$ 280 já foi cobrada e outras 5 seguem nos próximos meses.',
+          exp:'Parcelar preserva o dinheiro de hoje e transfere o custo para o seu "eu" dos próximos meses: R$ 180 a mais no total e 14% da sua renda comprometida até o fim da jornada.'};}},
+      {id:'C', titulo:'Não comprar agora', detalhe:'Continuar com o aparelho atual', aplicar(st){
+        st.flags.celularAntigo=true;
+        return {msg:'Você manteve o aparelho atual e seguiu com o mesmo saldo.',
+          exp:'Adiar uma compra mantém sua liquidez e sua liberdade de escolha. O custo é conviver com a limitação atual — e com o risco de o aparelho falhar quando você menos esperar.'};}},
+      {id:'D', titulo:'Comprar um seminovo', detalhe:'R$ 700 à vista', custo:700, aplicar(st){
+        const f=pagar(st,700,'Celular seminovo'); st.flags.celularSeminovo=true;
+        return {msg:'Você comprou um seminovo por R$ 700. '+f.texto,
+          exp:'Escolher uma versão mais barata resolve a necessidade sem consumir todo o recurso. O trade-off é aceitar menos garantia e maior chance de manutenção no futuro.'};}}
+    ]};
+}
+function cenaTentacao(titulo, texto, itemBarato){
+  return {tipo:'decisao', ilu:'compras', tag:'TENTAÇÃO', titulo:titulo,
+    texto:texto,
+    opcoes:[
+      {id:'A', titulo:'Comprar tudo à vista', detalhe:'R$ 300 agora', custo:300, aplicar(st){
+        const f=pagar(st,300); st.flags.impulso=(st.flags.impulso||0)+1;
+        return {msg:'Você gastou R$ 300. '+f.texto,
+          exp:'Recompensa também faz parte de um plano financeiro. A pergunta não é se você merece, e sim de onde saiu o dinheiro: do que sobrava ou do que estava protegendo você.'};}},
+      {id:'B', titulo:'Parcelar em 3 vezes', detalhe:'3 × R$ 110 = R$ 330', aplicar(st){
+        addParcela(st,'Compra pessoal',110,3); st.flags.impulso=(st.flags.impulso||0)+1;
+        return {msg:'Compra parcelada em 3 × R$ 110. A primeira parcela já saiu.',
+          exp:'Parcelar um desejo de R$ 300 parece leve, mas transforma um gasto pontual em compromisso fixo. Quando várias parcelas pequenas se somam, a renda some antes do fim do mês.'};}},
+      {id:'C', titulo:itemBarato.titulo, detalhe:itemBarato.detalhe, custo:itemBarato.valor, aplicar(st){
+        const f=pagar(st,itemBarato.valor);
+        return {msg:'Você gastou '+fmt(itemBarato.valor)+'. '+f.texto,
+          exp:'Você atendeu o desejo por uma fração do valor. Reduzir o tamanho da compra costuma ser mais sustentável do que se proibir de comprar.'};}},
+      {id:'D', titulo:'Não comprar agora', detalhe:'Manter o dinheiro', aplicar(st){
+        st.flags.adiouDesejo=true;
+        return {msg:'Você adiou a compra e manteve o dinheiro disponível.',
+          exp:'Essa escolha preservou seu dinheiro neste mês. Em contrapartida, você abriu mão de uma satisfação imediata — e planos que nunca incluem prazer costumam ser abandonados no meio do caminho.'};}}
+    ]};
+}
+function eventoBonus(){
+  return {tipo:'evento', ilu:'presente', tag:'ACONTECEU', titulo:'Um dinheiro extra caiu na conta',
+    texto:'Você recebeu <b>R$ 400</b> referente a uma participação de resultados da empresa. Não é um valor recorrente: ele acontece uma vez.',
+    opcoes:[{id:'A', titulo:'Receber e decidir no fechamento do mês', detalhe:'+ R$ 400', aplicar(st){
+      st.dinheiro+=400; sane();
+      return {msg:'R$ 400 entraram no seu dinheiro disponível.',
+        exp:'Dinheiro extra não muda sua vida financeira sozinho: o que muda é o destino que ele recebe. Sem decisão consciente, valores fora do previsto tendem a ser absorvidos pelo consumo.'};}}]};
+}
+
+const ROTEIRO = {
+/* ------------------------------- PERFIL 1 ------------------------------- */
+p1:[
+  st=>[ cenaInternet(),
+    {tipo:'decisao', ilu:'cofre', tag:'DECISÃO PRINCIPAL', titulo:'O primeiro mês sob seu controle',
+     texto:'Depois da ajuda em casa e do transporte, ainda sobra uma boa parte da sua renda. É a primeira vez que você decide sozinho o destino desse dinheiro.',
+     opcoes:[
+      {id:'A', titulo:'Separar R$ 500 para a reserva agora', detalhe:'No mesmo dia do pagamento', aplicar(st){
+        st.dinheiro-=500; st.reserva+=500; st.flags.pagaSePrimeiro=true; sane();
+        return {msg:'R$ 500 saíram do disponível e foram para a reserva.',
+          exp:'Separar antes de gastar transforma a poupança em uma despesa fixa. O custo é sentir menos folga no mês — e precisar de disciplina para não sacar de volta.'};}},
+      {id:'B', titulo:'Guardar o que sobrar no fim do mês', detalhe:'Sem valor definido', aplicar(st){
+        st.flags.guardaSobra=true;
+        return {msg:'Nada foi separado agora. O que sobrar no fechamento continua com você.',
+          exp:'Guardar "o que sobrar" funciona quando sobra. O risco é o consumo ocupar exatamente o espaço do que não foi reservado.'};}},
+      {id:'C', titulo:'Aproveitar: saídas e delivery', detalhe:'R$ 400 neste mês', custo:400, aplicar(st){
+        const f=pagar(st,400); st.flags.consumoAlto=(st.flags.consumoAlto||0)+1;
+        return {msg:'R$ 400 em lazer e delivery. '+f.texto,
+          exp:'Morar com a família cria a sensação de que tudo é sobra. O custo não aparece hoje: aparece no mês em que você precisar do dinheiro e ele não estiver mais lá.'};}}
+     ]}],
+  st=>[ cenaCelular('Seu celular trava e a bateria não passa da tarde. Você usa ele para tudo. Na loja, o modelo novo custa <b>R$ 1.500 à vista</b> ou <b>6 × R$ 280</b>.'),
+    {tipo:'decisao', ilu:'viagem', tag:'DECISÃO SECUNDÁRIA', titulo:'Viagem com os amigos',
+     texto:'O grupo fechou uma viagem de fim de semana. Sua parte fica em <b>R$ 450</b>. A confirmação precisa ser feita agora.',
+     opcoes:[
+      {id:'A', titulo:'Ir e pagar à vista', detalhe:'R$ 450', custo:450, aplicar(st){
+        const f=pagar(st,450); st.flags.consumoAlto=(st.flags.consumoAlto||0)+1;
+        return {msg:'Viagem confirmada por R$ 450. '+f.texto,
+          exp:'Experiências têm valor real e pagar à vista encerra o assunto. O impacto é imediato na sua liquidez do mês.'};}},
+      {id:'B', titulo:'Ir e parcelar', detalhe:'3 × R$ 165 = R$ 495', aplicar(st){
+        addParcela(st,'Viagem',165,3);
+        return {msg:'Viagem parcelada em 3 × R$ 165. A primeira já foi cobrada.',
+          exp:'Parcelar lazer significa continuar pagando por algo que já acabou. Some isso a outras parcelas e o mês seguinte começa menor do que você imagina.'};}},
+      {id:'C', titulo:'Não ir dessa vez', detalhe:'R$ 0', aplicar(st){
+        return {msg:'Você não foi à viagem e manteve o saldo.',
+          exp:'Dizer não a um gasto social preserva recursos, mas tem um custo que não aparece na planilha. Um plano sustentável precisa prever lazer, e não eliminá-lo.'};}}
+     ]}],
+  st=>[
+    {tipo:'decisao', ilu:'trabalho', tag:'OPORTUNIDADE', titulo:'Curso profissionalizante',
+     texto:'Surgiu um curso de <b>R$ 600</b> ligado à sua área. Quem terminou relata aumento de renda alguns meses depois — mas isso não é garantido.',
+     opcoes:[
+      {id:'A', titulo:'Pagar à vista', detalhe:'R$ 600', custo:600, aplicar(st){
+        const f=pagar(st,600); st.flags.curso=true;
+        return {msg:'Você se matriculou pagando R$ 600. '+f.texto,
+          exp:'Investir em capacidade de gerar renda é diferente de consumo: o retorno é incerto no prazo, mas não some com o uso. Ainda assim, saiu do seu caixa hoje.'};}},
+      {id:'B', titulo:'Parcelar o curso', detalhe:'3 × R$ 220 = R$ 660', aplicar(st){
+        addParcela(st,'Curso',220,3); st.flags.curso=true;
+        return {msg:'Curso parcelado em 3 × R$ 220.',
+          exp:'Parcelar mantém sua liquidez agora e distribui o esforço. O custo total sobe e a parcela concorre com tudo o que aparecer nos próximos meses.'};}},
+      {id:'C', titulo:'Estudar por conta própria', detalhe:'Gratuito, sem certificado', aplicar(st){
+        st.flags.cursoGratis=true;
+        return {msg:'Você optou por conteúdo gratuito e não gastou nada.',
+          exp:'Nem toda evolução exige gasto. Em compensação, você abre mão de estrutura, prazo e certificação — o que pode atrasar o retorno.'};}}
+     ]},
+    {tipo:'decisao', ilu:'cartao', tag:'DECISÃO', titulo:'Cartão de crédito aprovado',
+     texto:'O banco liberou um cartão com <b>limite de R$ 2.000</b> em seu nome. O limite aparece no aplicativo como se fosse saldo.',
+     opcoes:[
+      {id:'A', titulo:'Usar o cartão no dia a dia', detalhe:'Pagar tudo por ele', aplicar(st){
+        st.flags.cartaoUso=true;
+        return {msg:'Você passou a concentrar os gastos no cartão.',
+          exp:'O cartão adia o pagamento, não o gasto. O risco é a fatura chegar maior do que a memória do que foi comprado — e o mínimo virar rotina.'};}},
+      {id:'B', titulo:'Ativar e guardar para emergências', detalhe:'Sem uso planejado', aplicar(st){
+        st.flags.cartaoReserva=true;
+        return {msg:'Cartão ativo, guardado como recurso de emergência.',
+          exp:'Ter crédito disponível ajuda em situações extremas, mas crédito não é reserva: um resolve com dinheiro seu, o outro cria dívida com juros.'};}},
+      {id:'C', titulo:'Recusar o cartão', detalhe:'Sem limite disponível', aplicar(st){
+        st.flags.semCartao=true;
+        return {msg:'Você recusou o cartão.',
+          exp:'Sem limite, todo gasto precisa caber no que existe. Isso protege do endividamento e, ao mesmo tempo, deixa você sem rede em um imprevisto grande.'};}}
+     ]}],
+  st=>[
+    (st.flags.celularAntigo
+      ? {tipo:'evento', ilu:'alerta', tag:'IMPREVISTO', titulo:'Seu celular antigo parou de funcionar',
+         texto:'O aparelho que você decidiu manter não liga mais. Sem ele, você não consegue trabalhar nem se deslocar direito. O conserto sai por <b>R$ 350</b> e não tem garantia.',
+         opcoes:[
+          {id:'A', titulo:'Consertar por R$ 350', detalhe:'Resolve por enquanto', custo:350, aplicar(st){
+            const f=pagar(st,350); return {msg:'Conserto pago: R$ 350. '+f.texto,
+              exp:'Adiar uma compra economiza dinheiro até o dia em que o problema aparece. Reserva existe justamente para que esse dia não vire uma dívida.'};}},
+          {id:'B', titulo:'Comprar um aparelho parcelado', detalhe:'6 × R$ 199 = R$ 1.194', aplicar(st){
+            addParcela(st,'Celular emergencial',199,6); st.flags.celularNovo=true;
+            return {msg:'Você resolveu com 6 × R$ 199.',
+              exp:'Comprar sob pressão quase sempre custa mais caro: sem tempo para pesquisar, a única variável negociada vira o tamanho da parcela.'};}}]}
+      : {tipo:'decisao', ilu:'manutencao', tag:'IMPREVISTO', titulo:'A tela do celular trincou',
+         texto:'Uma queda trincou a tela. Ainda funciona, mas a assistência avisa que a infiltração pode piorar. O reparo custa <b>R$ 250</b>.',
+         opcoes:[
+          {id:'A', titulo:'Consertar agora', detalhe:'R$ 250', custo:250, aplicar(st){
+            const f=pagar(st,250); return {msg:'Reparo feito por R$ 250. '+f.texto,
+              exp:'Manutenção é um gasto pequeno que evita um gasto grande. Você trocou dinheiro presente por previsibilidade futura.'};}},
+          {id:'B', titulo:'Adiar o reparo', detalhe:'R$ 0 agora', aplicar(st){
+            st.flags.reparoAdiado=true;
+            return {msg:'Você adiou o reparo e manteve os R$ 250.',
+              exp:'Adiar preserva caixa hoje. O que você não sabe ainda é quanto esse adiamento vai custar quando o problema cobrar a conta.'};}},
+          {id:'C', titulo:'Consertar usando a reserva', detalhe:'R$ 250 da reserva', aplicar(st){
+            const r=Math.min(st.reserva,250); st.reserva-=r; const resto=250-r; if(resto>0) pagar(st,resto); sane(); st.flags.usouReserva=true;
+            return {msg:'Reparo pago com '+fmt(r)+' da reserva'+(resto>0?' e '+fmt(resto)+' do disponível':'')+'.',
+              exp:'Esse é exatamente o papel da reserva: absorver o imprevisto sem gerar dívida. O ponto de atenção é recompor o valor nos próximos meses.'};}}]}),
+    {tipo:'decisao', ilu:'trabalho', tag:'OPORTUNIDADE', titulo: st.flags.internet? 'Um trabalho extra apareceu' : 'Um trabalho extra apareceu (mas exige conexão)',
+     texto: st.flags.internet
+       ? 'Um conhecido ofereceu um serviço pontual de <b>R$ 400</b>, ocupando dois fins de semana.'
+       : 'Um conhecido ofereceu um serviço pontual de <b>R$ 400</b>, mas ele exige responder clientes fora de casa em tempo real. Sem internet móvel, você consegue entregar só metade do combinado: <b>R$ 200</b>.',
+     opcoes:[
+      {id:'A', titulo:'Aceitar o trabalho', detalhe: st.flags.internet? '+ R$ 400' : '+ R$ 200', aplicar(st){
+        const v = st.flags.internet? 400 : 200; st.dinheiro+=v; st.flags.rendaExtra=true; sane();
+        return {msg:'Você recebeu '+fmt(v)+' pelo serviço.',
+          exp: st.flags.internet
+            ? 'Aumentar a renda é a alavanca mais rápida quando as despesas já estão no limite. O custo aqui foi tempo — o único recurso que não dá para repor.'
+            : 'Uma decisão de custo fixo tomada no Mês 1 limitou uma receita no Mês 4. Cortar custos e perder oportunidades muitas vezes andam juntos.'};}},
+      {id:'B', titulo:'Recusar e descansar', detalhe:'R$ 0', aplicar(st){
+        return {msg:'Você recusou o trabalho extra.',
+          exp:'Descanso não é desperdício. Mas em meses de aperto, recusar renda extra significa que o ajuste terá que sair de algum outro lugar.'};}}
+     ]}],
+  st=>[
+    (st.flags.reparoAdiado
+      ? {tipo:'evento', ilu:'alerta', tag:'CONSEQUÊNCIA', titulo:'A trinca virou um problema maior',
+         texto:'A infiltração atingiu a placa. O que era um reparo de R$ 250 agora é um serviço de <b>R$ 650</b> — ou a troca do aparelho.',
+         opcoes:[
+          {id:'A', titulo:'Pagar o reparo de R$ 650', detalhe:'R$ 650', custo:650, aplicar(st){
+            const f=pagar(st,650); return {msg:'Reparo pago: R$ 650. '+f.texto,
+              exp:'A decisão de adiar economizou R$ 250 em um mês e custou R$ 400 a mais depois. Problemas ignorados raramente ficam do mesmo tamanho.'};}},
+          {id:'B', titulo:'Parcelar o reparo', detalhe:'4 × R$ 180 = R$ 720', aplicar(st){
+            addParcela(st,'Reparo do celular',180,4);
+            return {msg:'Reparo parcelado em 4 × R$ 180.',
+              exp:'Você resolveu o problema sem tirar tudo do caixa, mas transformou uma consequência do passado em compromisso do futuro.'};}}]}
+      : {tipo:'evento', ilu:'presente', tag:'ACONTECEU', titulo:'Aniversário na família',
+         texto:'Um aniversário importante chegou e você decidiu participar do presente coletivo: <b>R$ 150</b>.',
+         opcoes:[{id:'A', titulo:'Participar do presente', detalhe:'R$ 150', custo:150, aplicar(st){
+            const f=pagar(st,150); return {msg:'Você contribuiu com R$ 150. '+f.texto,
+              exp:'Gastos sociais são previsíveis ao longo do ano, ainda que a data pareça surpresa. Quem os inclui no orçamento não precisa improvisar.'};}}]}),
+    cenaTentacao('"Eu mereço": look + tênis',
+      'Você viu um tênis e uma peça de roupa que quer há tempos. Juntos: <b>R$ 300</b>. Foi um mês pesado e a sensação é de que você merece isso.',
+      {titulo:'Levar só o tênis mais simples', detalhe:'R$ 120', valor:120})],
+  st=>[ eventoBonus(),
+    {tipo:'decisao', ilu:'moto', tag:'DECISÃO FINAL', titulo:'A proposta da motocicleta',
+     texto:'A moto resolveria seu transporte e daria liberdade. A loja oferece: entrada de <b>R$ 1.000 + 24 × R$ 480</b>. Há também uma usada: entrada de <b>R$ 500 + 18 × R$ 330</b>. Sua renda é de R$ 2.000.',
+     opcoes:[
+      {id:'A', titulo:'Financiar a moto nova', detalhe:'R$ 1.000 de entrada + 24 × R$ 480', aplicar(st){
+        const f=pagar(st,1000); addParcela(st,'Financiamento da moto',480,24); st.flags.financiouMoto=true;
+        return {msg:'Financiamento fechado. '+f.texto+' A primeira das 24 parcelas de R$ 480 já foi cobrada.',
+          exp:'R$ 480 equivalem a 24% da sua renda comprometidos por dois anos — sem contar combustível, seguro e manutenção. Financiamento longo transforma liberdade de hoje em obrigação de amanhã.'};}},
+      {id:'B', titulo:'Financiar a moto usada', detalhe:'R$ 500 de entrada + 18 × R$ 330', aplicar(st){
+        const f=pagar(st,500); addParcela(st,'Financiamento da moto usada',330,18); st.flags.financiouMoto=true;
+        return {msg:'Você financiou a usada. '+f.texto+' Primeira de 18 parcelas de R$ 330 cobrada.',
+          exp:'Reduzir o tamanho do sonho reduz o tamanho do compromisso: R$ 150 a menos por mês. Ainda assim, 16% da renda seguem travados por um ano e meio.'};}},
+      {id:'C', titulo:'Adiar e continuar juntando', detalhe:'Sem parcelas novas', aplicar(st){
+        st.flags.adiouMoto=true;
+        return {msg:'Você adiou a compra e manteve sua estrutura financeira intacta.',
+          exp:'Entrar em um financiamento com reserva formada é diferente de entrar sem ela. Adiar não é desistir: é chegar na mesma compra com mais poder de negociação.'};}}
+     ]}]
+],
+/* ------------------------------- PERFIL 2 ------------------------------- */
+p2:[
+  st=>[ cenaInternet(),
+    {tipo:'decisao', ilu:'comida', tag:'DECISÃO PRINCIPAL', titulo:'Como você vai se alimentar no mês',
+     texto:'Você recebe <b>R$ 500 de VR</b>, que só pode ser usado com alimentação e não vira dinheiro na conta. O que sobrar no VR fica acumulado para os próximos meses.',
+     opcoes:[
+      {id:'A', titulo:'Mercado planejado e marmita', detalhe:'≈ R$ 380/mês no VR — sobra R$ 120', aplicar(st){
+        st.flags.consumoAlim=380; st.flags.alimPlanejada=true;
+        return {msg:'Consumo de alimentação ajustado para cerca de R$ 380 por mês no VR.',
+          exp:'O VR passa a sobrar todo mês, criando uma folga que protege sua conta. O custo é tempo e planejamento semanal.'};}},
+      {id:'B', titulo:'Comer fora quase todos os dias', detalhe:'R$ 500 do VR + R$ 150/mês do seu dinheiro', aplicar(st){
+        st.flags.consumoAlim=500; st.despesas.push({nome:'Alimentação além do VR', valor:150}); st.flags.alimCara=true;
+        return {msg:'Seu padrão consome todo o VR e mais R$ 150 por mês da sua conta.',
+          exp:'Quando o benefício acaba antes do mês, a diferença sai do dinheiro que pagaria contas. Um hábito diário pequeno vira um custo fixo invisível.'};}},
+      {id:'C', titulo:'Meio a meio', detalhe:'≈ R$ 470/mês no VR', aplicar(st){
+        st.flags.consumoAlim=470;
+        return {msg:'Você equilibrou mercado e refeições fora: cerca de R$ 470 por mês no VR.',
+          exp:'Seu VR cobre a alimentação com pouca folga. Funciona enquanto nada muda — e deixa pouca margem para meses atípicos.'};}}
+     ]}],
+  st=>[ cenaCelular('Seu celular começou a desligar sozinho e você depende dele para trabalho e transporte. O modelo novo custa <b>R$ 1.500 à vista</b> ou <b>6 × R$ 280</b>. Sua renda já compromete R$ 1.000 com moradia e transporte.'),
+    {tipo:'decisao', ilu:'cartao', tag:'DECISÃO SECUNDÁRIA', titulo:'Assinaturas do mês',
+     texto:'Amigos convidaram você a entrar em um combo de streaming e academia: <b>R$ 79 por mês</b>, cobrança automática, cancelável a qualquer momento.',
+     opcoes:[
+      {id:'A', titulo:'Assinar o combo', detalhe:'R$ 79 por mês', aplicar(st){
+        st.despesas.push({nome:'Assinaturas', valor:79}); st.flags.assinaturas=true;
+        return {msg:'R$ 79 entraram como despesa fixa mensal.',
+          exp:'Somando internet e assinaturas, uma fatia da renda passa a ser cobrada sem nova decisão. Custos automáticos são confortáveis justamente porque você para de percebê-los.'};}},
+      {id:'B', titulo:'Assinar só o streaming', detalhe:'R$ 35 por mês', aplicar(st){
+        st.despesas.push({nome:'Streaming', valor:35});
+        return {msg:'R$ 35 entraram como despesa fixa mensal.',
+          exp:'Você manteve o lazer com um custo menor. Recorrências pequenas são aceitáveis quando escolhidas — o problema é acumulá-las sem revisão.'};}},
+      {id:'C', titulo:'Não assinar nada agora', detalhe:'R$ 0', aplicar(st){
+        return {msg:'Você seguiu sem novas assinaturas.',
+          exp:'Cada custo fixo evitado aumenta a parte da renda que você ainda pode decidir. A contrapartida é abrir mão de conveniência e lazer.'};}}
+     ]}],
+  st=>[
+    {tipo:'decisao', ilu:'manutencao', tag:'IMPREVISTO', titulo:'Vazamento no banheiro',
+     texto:'Apareceu um vazamento atrás do vaso sanitário. O encanador cobra <b>R$ 450</b> para resolver de forma definitiva ou <b>R$ 150</b> para um reparo provisório.',
+     opcoes:[
+      {id:'A', titulo:'Reparo definitivo', detalhe:'R$ 450', custo:450, aplicar(st){
+        const f=pagar(st,450); return {msg:'Problema resolvido por R$ 450. '+f.texto,
+          exp:'Resolver de vez custa mais hoje e elimina a incerteza. Em imóvel alugado, você também evita ser responsabilizado por um dano maior.'};}},
+      {id:'B', titulo:'Reparo provisório', detalhe:'R$ 150', custo:150, aplicar(st){
+        const f=pagar(st,150); st.flags.reparoPaliativo=true;
+        return {msg:'Reparo provisório feito por R$ 150. '+f.texto,
+          exp:'Soluções parciais aliviam o caixa e mantêm o risco em aberto. Às vezes é a decisão certa — desde que você saiba que ela ainda não terminou.'};}},
+      {id:'C', titulo:'Adiar e observar', detalhe:'R$ 0 agora', aplicar(st){
+        st.flags.vazamentoAdiado=true;
+        return {msg:'Você decidiu esperar para ver se piora.',
+          exp:'Adiar mantém o dinheiro com você. O que não dá para prever é o tamanho da conta quando o problema decidir aparecer.'};}}
+     ]},
+    {tipo:'decisao', ilu:'viagem', tag:'OPORTUNIDADE', titulo:'Passagem para visitar a família',
+     texto:'Uma promoção deixou a passagem por <b>R$ 320</b>, com viagem daqui a três meses. Fora da promoção, o mesmo trecho custa cerca de R$ 520.',
+     opcoes:[
+      {id:'A', titulo:'Comprar na promoção', detalhe:'R$ 320 agora', custo:320, aplicar(st){
+        const f=pagar(st,320); return {msg:'Passagem comprada por R$ 320. '+f.texto,
+          exp:'Antecipar um gasto que já é certo pode economizar dinheiro. Isso só funciona quando o valor sai do que sobra, e não do que protege você.'};}},
+      {id:'B', titulo:'Deixar para depois', detalhe:'≈ R$ 520 no futuro', aplicar(st){
+        st.flags.passagemDepois=true;
+        return {msg:'Você preferiu manter o dinheiro disponível agora.',
+          exp:'Preservar liquidez tem valor real, especialmente com pouca reserva. O preço dessa segurança, aqui, é R$ 200 a mais lá na frente.'};}},
+      {id:'C', titulo:'Não viajar neste período', detalhe:'R$ 0', aplicar(st){
+        return {msg:'Você abriu mão da viagem neste momento.',
+          exp:'Cortar um gasto grande é a forma mais rápida de equilibrar o mês. O custo não é financeiro, e nem por isso é zero.'};}}
+     ]}],
+  st=>[
+    {tipo:'evento', ilu:'casa', tag:'IMPREVISTO', titulo:'Reajuste do aluguel',
+     texto:'O proprietário comunicou o reajuste anual: o aluguel passa de <b>R$ 650 para R$ 750</b> a partir do próximo mês. Você pode aceitar, negociar ou procurar outro imóvel.',
+     opcoes:[
+      {id:'A', titulo:'Aceitar o reajuste', detalhe:'Aluguel de R$ 750/mês', aplicar(st){
+        const d=st.despesas.find(x=>x.nome==='Aluguel'); d.valor=750; st.flags.aluguel750=true;
+        return {msg:'Seu aluguel passa a ser R$ 750 por mês.',
+          exp:'R$ 100 a mais por mês são R$ 1.200 por ano saindo da sua capacidade de poupar. Quando a despesa fixa sobe, a reserva é a primeira a sentir.'};}},
+      {id:'B', titulo:'Negociar com o proprietário', detalhe:'R$ 700/mês, com 12 meses de compromisso', aplicar(st){
+        const d=st.despesas.find(x=>x.nome==='Aluguel'); d.valor=700; st.flags.negociou=true;
+        return {msg:'Negociação aceita: aluguel de R$ 700 por mês.',
+          exp:'Negociar é uma das poucas formas de reduzir custo fixo sem reduzir padrão de vida. Em troca, você assumiu um compromisso de permanência.'};}},
+      {id:'C', titulo:'Mudar para um imóvel mais barato', detalhe:'Aluguel R$ 550, transporte +R$ 150, mudança R$ 400', aplicar(st){
+        const d=st.despesas.find(x=>x.nome==='Aluguel'); d.valor=550;
+        const t=st.despesas.find(x=>x.nome==='Transporte'); t.valor=350;
+        const f=pagar(st,400); st.flags.mudou=true;
+        return {msg:'Você se mudou. Aluguel R$ 550 e transporte R$ 350. Custo da mudança: R$ 400. '+f.texto,
+          exp:'Aluguel menor não significa custo menor: aqui a economia real foi de R$ 50 por mês, com R$ 400 pagos à vista. Decisões de moradia precisam ser calculadas somando deslocamento.'};}}
+     ]}],
+  st=>[
+    (st.flags.vazamentoAdiado || st.flags.reparoPaliativo
+      ? {tipo:'evento', ilu:'alerta', tag:'CONSEQUÊNCIA', titulo:'O vazamento voltou — e piorou',
+         texto:'A infiltração atingiu o piso do vizinho de baixo. O reparo agora sai por <b>'+(st.flags.vazamentoAdiado?'R$ 900':'R$ 500')+'</b>, incluindo o conserto do dano causado.',
+         opcoes:[
+          {id:'A', titulo:'Pagar o reparo', detalhe: st.flags.vazamentoAdiado?'R$ 900':'R$ 500', custo: st.flags.vazamentoAdiado?900:500, aplicar(st){
+            const v=st.flags.vazamentoAdiado?900:500; const f=pagar(st,v);
+            return {msg:'Reparo pago: '+fmt(v)+'. '+f.texto,
+              exp:'Uma decisão de R$ 450 no Mês 3 virou uma conta bem maior no Mês 5. Manutenção adiada costuma ser cobrada com juros que nenhum contrato mostra.'};}},
+          {id:'B', titulo:'Parcelar o serviço', detalhe: st.flags.vazamentoAdiado?'6 × R$ 175':'4 × R$ 140', aplicar(st){
+            const v=st.flags.vazamentoAdiado?175:140, n=st.flags.vazamentoAdiado?6:4;
+            addParcela(st,'Reparo hidráulico',v,n);
+            return {msg:'Serviço parcelado em '+n+' × '+fmt(v)+'.',
+              exp:'Você protegeu o caixa do mês e levou o passado para dentro do futuro. Cada parcela criada reduz o espaço de decisão dos próximos meses.'};}}]}
+      : {tipo:'evento', ilu:'invest', tag:'ACONTECEU', titulo:'Conta de energia acima do previsto',
+         texto:'O consumo do mês subiu e a conta de energia veio <b>R$ 80 acima</b> do normal.',
+         opcoes:[{id:'A', titulo:'Pagar a diferença', detalhe:'R$ 80', custo:80, aplicar(st){
+            const f=pagar(st,80); return {msg:'Diferença paga: R$ 80. '+f.texto,
+              exp:'Contas variáveis oscilam todo mês. Um orçamento realista trabalha com a média alta, não com o melhor cenário.'};}}]}),
+    cenaTentacao('"Eu mereço": passeio + jantar',
+      'Um fim de semana com passeio e jantar sairia por <b>R$ 300</b>. Você trabalhou muito e faz tempo que não sai.',
+      {titulo:'Fazer uma versão mais simples', detalhe:'R$ 120', valor:120})],
+  st=>[ eventoBonus(),
+    {tipo:'decisao', ilu:'casa', tag:'DECISÃO FINAL', titulo:'Mudar para um apartamento melhor',
+     texto:'Apareceu um apartamento perto do trabalho: aluguel de <b>R$ 900</b>, mas você <b>elimina os R$ 200 de transporte</b> e ganha qualidade de vida. A mudança e o depósito custam <b>R$ 800</b>.',
+     opcoes:[
+      {id:'A', titulo:'Mudar agora', detalhe:'R$ 800 de entrada, custo fixo líquido +R$ 50/mês', aplicar(st){
+        const al=st.despesas.find(x=>x.nome==='Aluguel'); const tr=st.despesas.find(x=>x.nome==='Transporte');
+        const antes=al.valor+tr.valor; al.valor=900; tr.valor=0; const f=pagar(st,800); st.flags.mudouFinal=true;
+        return {msg:'Mudança realizada. Antes: '+fmt(antes)+'/mês entre aluguel e transporte. Agora: R$ 900/mês. '+f.texto,
+          exp:'Trocar transporte por aluguel pode fazer sentido, mas aluguel é rígido e transporte é flexível: se a renda cair, dá para andar menos — não dá para pagar menos aluguel.'};}},
+      {id:'B', titulo:'Continuar onde está', detalhe:'Sem custo adicional', aplicar(st){
+        return {msg:'Você decidiu permanecer no imóvel atual.',
+          exp:'Manter a estrutura atual preserva reserva e previsibilidade. O custo é continuar com o deslocamento e adiar a melhora de padrão.'};}},
+      {id:'C', titulo:'Mudar usando a reserva', detalhe:'R$ 800 retirados da reserva', aplicar(st){
+        const al=st.despesas.find(x=>x.nome==='Aluguel'); const tr=st.despesas.find(x=>x.nome==='Transporte');
+        al.valor=900; tr.valor=0;
+        const r=Math.min(st.reserva,800); st.reserva-=r; const resto=800-r; if(resto>0) pagar(st,resto); sane();
+        st.flags.usouReserva=true; st.flags.mudouFinal=true;
+        return {msg:'Mudança feita com '+fmt(r)+' da reserva'+(resto>0?' e '+fmt(resto)+' do disponível':'')+'.',
+          exp:'Usar a reserva para melhorar o padrão de vida é diferente de usá-la para uma emergência: você aumenta o custo fixo justamente no momento em que fica sem proteção.'};}}
+     ]}]
+],
+/* ------------------------------- PERFIL 3 ------------------------------- */
+p3:[
+  st=>[ cenaInternet(),
+    {tipo:'decisao', ilu:'cartao', tag:'DECISÃO PRINCIPAL', titulo:'O que fazer com a dívida de R$ 1.500',
+     texto:'Sua dívida cobra <b>7% de juros ao mês</b> e a parcela mínima é de R$ 250. Pagar só o mínimo mantém o nome limpo, mas o saldo devedor continua rendendo juros contra você.',
+     opcoes:[
+      {id:'A', titulo:'Pagar apenas o mínimo', detalhe:'R$ 250 por mês', aplicar(st){
+        st.flags.soMinimo=true;
+        return {msg:'Você seguirá pagando apenas a parcela mínima de R$ 250.',
+          exp:'O mínimo mantém a dívida viva: parte do pagamento cobre os juros do mês e o principal quase não cai. É o formato mais confortável no curto prazo e o mais caro no longo.'};}},
+      {id:'B', titulo:'Pagar o mínimo + R$ 400 extras', detalhe:'R$ 400 amortizados agora', custo:400, aplicar(st){
+        const v=Math.min(400, st.dinheiro+st.reserva); const f=pagar(st,v); st.divida=r2(Math.max(0,st.divida-v));
+        st.flags.amortizou=true; sane();
+        return {msg:fmt(v)+' abatidos diretamente do saldo devedor. '+f.texto,
+          exp:'Amortizar reduz a base sobre a qual os juros incidem: cada real hoje vale mais do que amanhã. O custo é ficar com menos folga imediata.'};}},
+      {id:'C', titulo:'Negociar a dívida', detalhe:'6 × R$ 260 sem juros = R$ 1.560', aplicar(st){
+        st.divida=0; addParcela(st,'Acordo da dívida',260,6); st.flags.negociouDivida=true; sane();
+        return {msg:'Acordo fechado: dívida convertida em 6 parcelas fixas de R$ 260, sem novos juros. A primeira já foi paga.',
+          exp:'Trocar uma dívida com juros altos por parcelas fixas transforma um problema que cresce em um compromisso que termina. Você ganha previsibilidade e perde flexibilidade.'};}}
+     ]}],
+  st=>[ cenaCelular('Seu celular mal segura carga e você depende dele para trabalhar. A loja oferece <b>R$ 1.500 à vista</b> ou <b>6 × R$ 280</b>, com aprovação imediata mesmo com o seu histórico.'),
+    {tipo:'decisao', ilu:'compras', tag:'DECISÃO SECUNDÁRIA', titulo:'Promoção no cartão',
+     texto:'Chegou uma oferta: <b>R$ 800 em compras</b> na loja, em 10 × R$ 95 (total R$ 950), aprovada no seu limite disponível. Nada disso é urgente.',
+     opcoes:[
+      {id:'A', titulo:'Aproveitar a promoção', detalhe:'10 × R$ 95 = R$ 950', aplicar(st){
+        addParcela(st,'Compras na promoção',95,10); st.flags.impulso=(st.flags.impulso||0)+1;
+        return {msg:'Compra aprovada: 10 × R$ 95. A primeira parcela já saiu.',
+          exp:'Crédito disponível não é dinheiro seu, é dinheiro emprestado com data marcada. Comprar parcelado durante um processo de quitação faz a dívida antiga e a nova dividirem a mesma renda.'};}},
+      {id:'B', titulo:'Comprar só o essencial', detalhe:'R$ 200 à vista', custo:200, aplicar(st){
+        const f=pagar(st,200); return {msg:'Você comprou apenas o necessário: R$ 200. '+f.texto,
+          exp:'Reduzir o tamanho da compra e pagar à vista mantém o mês fechado e não cria compromisso futuro.'};}},
+      {id:'C', titulo:'Não comprar nada', detalhe:'R$ 0', aplicar(st){
+        st.flags.recusouPromo=true;
+        return {msg:'Você ignorou a promoção.',
+          exp:'Desconto só é economia quando você já ia comprar. Fora disso, é uma despesa apresentada com uma boa história.'};}}
+     ]}],
+  st=>[
+    {tipo:'decisao', ilu:'cartao', tag:'DECISÃO PRINCIPAL', titulo:'Seu limite foi aumentado para R$ 3.000',
+     texto:'O banco elevou seu limite e a mensagem chegou como um elogio: "parabéns pelo seu bom relacionamento". Na mesma tela, uma TV de <b>R$ 1.200 em 10 × R$ 135</b> aparece como sugestão.',
+     opcoes:[
+      {id:'A', titulo:'Aceitar o limite e comprar a TV', detalhe:'10 × R$ 135 = R$ 1.350', aplicar(st){
+        addParcela(st,'TV',135,10); st.flags.limiteAlto=true; st.flags.impulso=(st.flags.impulso||0)+1;
+        return {msg:'TV comprada em 10 × R$ 135. A primeira parcela já foi cobrada.',
+          exp:'Aumento de limite não é aumento de renda. Ele amplia a capacidade de assumir compromissos com exatamente o mesmo dinheiro para pagá-los.'};}},
+      {id:'B', titulo:'Aceitar o limite e não usar', detalhe:'Sem gasto', aplicar(st){
+        st.flags.limiteAlto=true;
+        return {msg:'Limite aumentado, sem nenhuma compra.',
+          exp:'Limite parado é neutro: só vira risco quando é confundido com saldo. A vantagem é ter margem numa emergência real.'};}},
+      {id:'C', titulo:'Recusar o aumento de limite', detalhe:'Manter o limite atual', aplicar(st){
+        st.flags.recusouLimite=true;
+        return {msg:'Você pediu para manter o limite atual.',
+          exp:'Reduzir a tentação é uma estratégia legítima quando o histórico mostra dificuldade com crédito. O custo é ter menos margem em uma emergência.'};}}
+     ]},
+    {tipo:'decisao', ilu:'trabalho', tag:'OPORTUNIDADE', titulo:'Um bico de R$ 500',
+     texto:'Você fez um serviço extra e recebeu <b>R$ 500</b>. Esse valor já está no seu dinheiro disponível — falta decidir o destino.',
+     opcoes:[
+      {id:'A', titulo:'Abater direto na dívida', detalhe:'R$ 500 no saldo devedor', aplicar(st){
+        st.dinheiro+=500; const v=Math.min(500,st.divida); st.divida-=v; st.dinheiro-=v; st.flags.amortizou=true; sane();
+        return {msg:'R$ 500 recebidos e '+fmt(v)+' abatidos da dívida.'+(v<500?' O restante ficou disponível.':''),
+          exp:'Quando existe dívida com juros altos, abatê-la costuma render mais do que qualquer aplicação: você deixa de pagar 7% ao mês.'};}},
+      {id:'B', titulo:'Guardar na reserva', detalhe:'R$ 500 na reserva', aplicar(st){
+        st.dinheiro+=500; st.dinheiro-=500; st.reserva+=500; sane();
+        return {msg:'R$ 500 foram direto para a reserva.',
+          exp:'Ter uma reserva mínima evita recorrer ao crédito no próximo imprevisto. O custo é continuar pagando juros sobre a dívida enquanto o dinheiro fica parado.'};}},
+      {id:'C', titulo:'Usar para o que estava faltando', detalhe:'R$ 500 em consumo', aplicar(st){
+        st.dinheiro+=500; const f=pagar(st,500); st.flags.impulso=(st.flags.impulso||0)+1;
+        return {msg:'Você recebeu e gastou os R$ 500. '+f.texto,
+          exp:'Renda extra some rápido quando não tem destino definido antes de cair na conta. O mês seguinte começa exatamente igual ao anterior.'};}}
+     ]}],
+  st=>[
+    (st.divida>0.01
+      ? {tipo:'decisao', ilu:'invest', tag:'OPORTUNIDADE', titulo:'Proposta de quitação com desconto',
+         texto:'A empresa ofereceu <b>30% de desconto</b> para quitação. Seu saldo devedor é de <b>'+fmt(st.divida)+'</b> — a quitação à vista sai por <b>'+fmt(r2(st.divida*0.7))+'</b>. A oferta vale só este mês.',
+         opcoes:[
+          {id:'A', titulo:'Quitar à vista com desconto', detalhe:'Pagar '+fmt(r2(st.divida*0.7)), custo:r2(st.divida*0.7), aplicar(st){
+            const v=r2(st.divida*0.7); const economia=r2(st.divida-v); const f=pagar(st,v); st.divida=0; st.flags.quitou=true; sane();
+            return {msg:'Dívida quitada por '+fmt(v)+'. Você economizou '+fmt(economia)+'. '+f.texto,
+              exp:'Quitar com desconto encerra os juros que corriam contra você todo mês. Se o pagamento veio de crédito, porém, você apenas trocou de credor.'};}},
+          {id:'B', titulo:'Aceitar acordo parcelado', detalhe:'3 parcelas, 15% de desconto', aplicar(st){
+            const total=r2(st.divida*0.85); const p=r2(total/3); st.divida=0; addParcela(st,'Acordo de quitação',p,3); st.flags.acordou=true; sane();
+            return {msg:'Acordo fechado: 3 × '+fmt(p)+'. A primeira parcela já foi paga.',
+              exp:'Você reduziu o total devido e parou os juros, sem esvaziar o caixa de uma vez. Em troca, assumiu parcelas fixas que não aceitam atraso.'};}},
+          {id:'C', titulo:'Manter o pagamento mínimo', detalhe:'Sem mudança', aplicar(st){
+            st.flags.recusouDesconto=true;
+            return {msg:'Você manteve o pagamento mínimo mensal.',
+              exp:'Preservar dinheiro hoje tem valor — mas aqui o custo é continuar pagando 7% ao mês sobre um saldo que poderia ter encolhido 30% de uma vez.'};}}]}
+      : {tipo:'evento', ilu:'trofeu', tag:'MARCO', titulo:'Sem dívidas pela primeira vez',
+         texto:'Seu saldo devedor está zerado. A parcela que sumiu do orçamento é <b>dinheiro que agora tem outro destino</b>: reserva, objetivo ou consumo.',
+         opcoes:[{id:'A', titulo:'Seguir com o orçamento livre', detalhe:'Sem custo', aplicar(st){
+            st.flags.livreDeDividas=true;
+            return {msg:'Você segue o mês sem parcelas de dívida.',
+              exp:'O momento após quitar é o mais decisivo: sem um novo destino definido, a folga costuma ser ocupada por um novo compromisso em poucos meses.'};}}]}),
+    {tipo:'decisao', ilu:'manutencao', tag:'IMPREVISTO', titulo:'Problema no transporte',
+     texto:'Um problema mecânico apareceu e o conserto sai por <b>R$ 380</b>. Sem ele, você gastaria mais com transporte alternativo nos próximos meses.',
+     opcoes:[
+      {id:'A', titulo:'Consertar agora', detalhe:'R$ 380', custo:380, aplicar(st){
+        const f=pagar(st,380); return {msg:'Conserto pago: R$ 380. '+f.texto,
+          exp:'Manutenção do que gera ou preserva renda costuma ser prioridade sobre desejo. Ainda assim, o valor precisa sair de algum lugar.'};}},
+      {id:'B', titulo:'Adiar e usar transporte alternativo', detalhe:'+ R$ 120/mês', aplicar(st){
+        st.despesas.push({nome:'Transporte alternativo', valor:120}); st.flags.adiouConserto=true;
+        return {msg:'Você adiou o conserto e passou a gastar R$ 120 a mais por mês com transporte.',
+          exp:'Evitar um gasto único criou um gasto recorrente. Em poucos meses, o total pago supera o valor do conserto — sem resolver o problema.'};}}
+     ]}],
+  st=>[
+    cenaTentacao('"Eu mereço": fone + smartwatch',
+      'Um fone e um smartwatch em promoção somam <b>R$ 300</b>. O vendedor lembra que cabe tranquilamente no seu limite.',
+      {titulo:'Levar apenas o fone', detalhe:'R$ 110', valor:110}),
+    ((st.flags.usouCredito || st.flags.limiteAlto)
+      ? {tipo:'evento', ilu:'alerta', tag:'CONSEQUÊNCIA', titulo:'A fatura chegou maior do que a memória',
+         texto:'A soma das compras parceladas e do uso do crédito deixou a fatura acima do previsto. Uma taxa de <b>R$ 90</b> foi cobrada por encargos.',
+         opcoes:[{id:'A', titulo:'Pagar os encargos', detalhe:'R$ 90', custo:90, aplicar(st){
+            const f=pagar(st,90); return {msg:'Encargos pagos: R$ 90. '+f.texto,
+              exp:'O crédito cobra duas vezes: o valor da compra e o custo de ter comprado antes de ter. Encargos são a parte invisível de decisões tomadas meses atrás.'};}}]}
+      : {tipo:'evento', ilu:'trofeu', tag:'ACONTECEU', titulo:'Seu nome voltou a ficar limpo',
+         texto:'Com os pagamentos em dia, você recebeu a confirmação de que seu cadastro está regularizado.',
+         opcoes:[{id:'A', titulo:'Continuar', detalhe:'Sem custo', aplicar(st){
+            st.flags.nomeLimpo=true;
+            return {msg:'Cadastro regularizado.',
+              exp:'Histórico de crédito é construído por comportamento repetido, não por um único pagamento. Ele reduz o custo do dinheiro que você precisar no futuro.'};}}]})],
+  st=>[ eventoBonus(),
+    {tipo:'decisao', ilu:'cartao', tag:'DECISÃO FINAL', titulo:'Oferta de empréstimo de R$ 3.000',
+     texto:'O banco ofereceu <b>R$ 3.000 na conta hoje</b>, em 12 × R$ 340 (total R$ 4.080). A mensagem diz: "use como quiser".',
+     opcoes:[
+      {id:'A', titulo:'Aceitar e quitar o que ainda deve', detalhe:'+ R$ 3.000 hoje, 12 × R$ 340', aplicar(st){
+        st.dinheiro+=3000; const v=Math.min(3000,st.divida); st.divida-=v; st.dinheiro-=v;
+        addParcela(st,'Empréstimo pessoal',340,12); st.flags.emprestimo=true; sane();
+        return {msg:'Empréstimo aprovado. '+(v>0? fmt(v)+' usados para quitar a dívida antiga.' : 'Nenhuma dívida antiga para quitar — o valor ficou disponível.'),
+          exp:'Trocar dívida cara por dívida mais barata pode fazer sentido. Pegar crédito sem dívida a quitar só antecipa consumo: você paga R$ 4.080 por R$ 3.000.'};}},
+      {id:'B', titulo:'Aceitar e usar o dinheiro', detalhe:'+ R$ 3.000 disponíveis, 12 × R$ 340', aplicar(st){
+        st.dinheiro+=3000; addParcela(st,'Empréstimo pessoal',340,12); st.flags.emprestimo=true; st.flags.impulso=(st.flags.impulso||0)+1; sane();
+        return {msg:'R$ 3.000 entraram na conta e a primeira das 12 parcelas de R$ 340 já foi cobrada.',
+          exp:'Dinheiro emprestado parece renda por alguns dias. A diferença aparece quando a parcela chega: R$ 1.080 de custo por antecipar o que ainda não era seu.'};}},
+      {id:'C', titulo:'Recusar a oferta', detalhe:'Sem novas dívidas', aplicar(st){
+        st.flags.recusouEmprestimo=true;
+        return {msg:'Você recusou o empréstimo.',
+          exp:'Crédito é ferramenta, não solução. Recusar quando não há um destino claro mantém sua renda futura livre para as suas escolhas, não para as parcelas.'};}}
+     ]}]
+],
+/* ------------------------------- PERFIL 4 ------------------------------- */
+p4:[
+  st=>[ cenaInternet(),
+    {tipo:'decisao', ilu:'cofre', tag:'DECISÃO PRINCIPAL', titulo:'Como perseguir os R$ 5.000',
+     texto:'Seu projeto pessoal custa <b>R$ 5.000</b>. Depois das despesas, sobram cerca de R$ 1.250 por mês. A pergunta é quanto disso você vai comprometer com o objetivo.',
+     opcoes:[
+      {id:'A', titulo:'Aporte automático de R$ 800/mês', detalhe:'R$ 800 vão para a reserva agora', aplicar(st){
+        st.dinheiro-=800; st.reserva+=800; st.flags.aporteAlto=true; sane();
+        return {msg:'R$ 800 movidos para a reserva do objetivo neste mês.',
+          exp:'Aportes agressivos aceleram a meta, mas deixam pouca folga: qualquer imprevisto vai bater na mesma reserva que você está formando.'};}},
+      {id:'B', titulo:'Aporte de R$ 400/mês, mantendo folga', detalhe:'R$ 400 para a reserva agora', aplicar(st){
+        st.dinheiro-=400; st.reserva+=400; st.flags.aporteMedio=true; sane();
+        return {msg:'R$ 400 movidos para a reserva do objetivo.',
+          exp:'Ritmo moderado leva mais tempo e resiste melhor a surpresas. O risco é o dinheiro não comprometido ser absorvido pelo consumo.'};}},
+      {id:'C', titulo:'Guardar o que sobrar no fim do mês', detalhe:'Sem valor fixo', aplicar(st){
+        st.flags.guardaSobra=true;
+        return {msg:'Nenhum valor foi separado agora.',
+          exp:'Objetivos sem valor definido competem com todos os desejos do mês em igualdade. O que não tem prioridade explícita costuma ficar por último.'};}}
+     ]}],
+  st=>[ cenaCelular('Seu celular ainda funciona, mas está lento e a bateria dura pouco. O modelo novo custa <b>R$ 1.500 à vista</b> ou <b>6 × R$ 280</b> — o equivalente a 30% do seu objetivo.'),
+    {tipo:'decisao', ilu:'trabalho', tag:'DECISÃO SECUNDÁRIA', titulo:'Um evento da sua área',
+     texto:'Um evento profissional com boas conexões custa <b>R$ 350</b>, incluindo deslocamento. Ele pode abrir portas — ou apenas ser um bom fim de semana.',
+     opcoes:[
+      {id:'A', titulo:'Participar', detalhe:'R$ 350', custo:350, aplicar(st){
+        const f=pagar(st,350); st.flags.evento=true;
+        return {msg:'Inscrição paga: R$ 350. '+f.texto,
+          exp:'Gastos que ampliam rede e conhecimento têm retorno incerto no prazo, mas real. Isso não os torna gratuitos: R$ 350 saíram do seu objetivo.'};}},
+      {id:'B', titulo:'Assistir à transmissão online', detalhe:'R$ 60', custo:60, aplicar(st){
+        const f=pagar(st,60); return {msg:'Você acompanhou online por R$ 60. '+f.texto,
+          exp:'Uma versão reduzida entrega parte do valor por uma fração do custo. Você perde o contato presencial, que costuma ser o principal ativo desse tipo de evento.'};}},
+      {id:'C', titulo:'Não participar', detalhe:'R$ 0', aplicar(st){
+        return {msg:'Você não participou do evento.',
+          exp:'Proteger o objetivo exige recusar coisas boas, não apenas coisas ruins. É aí que a meta começa a ser testada de verdade.'};}}
+     ]}],
+  st=>[
+    {tipo:'decisao', ilu:'invest', tag:'DECISÃO PRINCIPAL', titulo:'Onde deixar R$ 800',
+     texto:'Você tem a chance de aplicar <b>R$ 800</b>. As opções entregam retornos diferentes — e liberdades diferentes.',
+     opcoes:[
+      {id:'A', titulo:'Aplicação com prazo, rende mais', detalhe:'R$ 800 travados até o Mês 6', custo:800, aplicar(st){
+        const v=Math.min(800, st.dinheiro+st.reserva); const f=pagar(st,v); st.invest+=v; st.flags.investBloqueado=true; st.flags.investPrazo=true; sane();
+        return {msg:fmt(v)+' aplicados com rendimento maior, sem resgate antes do prazo. '+f.texto,
+          exp:'Rentabilidade maior costuma ser o preço da menor liquidez. Enquanto estiver travado, esse dinheiro não poderá socorrer você em um imprevisto.'};}},
+      {id:'B', titulo:'Aplicação com liquidez diária', detalhe:'R$ 800, resgate a qualquer momento', custo:800, aplicar(st){
+        const v=Math.min(800, st.dinheiro+st.reserva); const f=pagar(st,v); st.invest+=v; sane();
+        return {msg:fmt(v)+' aplicados com resgate livre. '+f.texto,
+          exp:'Você abre mão de um pouco de retorno para manter acesso imediato. Para reserva de emergência, liquidez costuma valer mais do que rendimento.'};}},
+      {id:'C', titulo:'Deixar o dinheiro parado na conta', detalhe:'Sem rendimento', aplicar(st){
+        st.flags.paradoNaConta=true;
+        return {msg:'O dinheiro continua disponível, sem render nada.',
+          exp:'Dinheiro parado é o mais flexível e o único que perde valor com certeza ao longo do tempo. Segurança total também tem preço.'};}}
+     ]},
+    {tipo:'decisao', ilu:'compras', tag:'DECISÃO SECUNDÁRIA', titulo:'Item do projeto em promoção',
+     texto:'Um dos itens do seu projeto apareceu com desconto: <b>R$ 900</b> (custaria R$ 1.200 depois). Comprar agora antecipa parte da meta e reduz seu caixa.',
+     opcoes:[
+      {id:'A', titulo:'Comprar agora com desconto', detalhe:'R$ 900', custo:900, aplicar(st){
+        const f=pagar(st,900); st.flags.itemAntecipado=true;
+        return {msg:'Item comprado por R$ 900. '+f.texto,
+          exp:'Antecipar parte de um objetivo com desconto real economiza dinheiro. O risco é montar o projeto aos pedaços e perder a visão do total.'};}},
+      {id:'B', titulo:'Manter o plano original', detalhe:'R$ 0 agora', aplicar(st){
+        return {msg:'Você manteve o plano e o dinheiro.',
+          exp:'Seguir o plano protege contra decisões movidas por urgência criada. O custo possível é pagar mais caro depois.'};}}
+     ]}],
+  st=>[
+    {tipo:'decisao', ilu:'trofeu', tag:'DECISÃO PRINCIPAL', titulo:'Realizar o projeto antes da hora',
+     texto:'Surgiu a chance de fechar o projeto agora por <b>R$ 4.000</b> em vez de R$ 5.000. Você tem hoje '+fmt(st.reserva+st.invest)+' entre reserva e investimentos.',
+     opcoes:[
+      {id:'A', titulo:'Realizar agora usando reserva e investimentos', detalhe:'R$ 4.000', custo:4000, aplicar(st){
+        const f=pagar(st,4000); st.flags.objetivoRealizado=true; st.flags.realizouCedo=true;
+        return {msg:'Projeto realizado por R$ 4.000. '+f.texto,
+          exp:'Você economizou R$ 1.000 e atingiu o objetivo — ficando, no mesmo movimento, sem colchão. Realizar sonhos com toda a reserva transfere o risco para os meses seguintes.'};}},
+      {id:'B', titulo:'Realizar parcelando metade', detalhe:'R$ 2.000 agora + 5 × R$ 430', aplicar(st){
+        const f=pagar(st,2000); addParcela(st,'Projeto pessoal',430,5); st.flags.objetivoRealizado=true; st.flags.parcelouProjeto=true;
+        return {msg:'Projeto realizado: R$ 2.000 à vista e 5 × R$ 430. '+f.texto,
+          exp:'Dividir preserva parte da segurança e cria um compromisso mensal. Você paga R$ 150 a mais e mantém uma reserva viva.'};}},
+      {id:'C', titulo:'Esperar e seguir o plano', detalhe:'Sem gasto agora', aplicar(st){
+        st.flags.esperou=true;
+        return {msg:'Você manteve o plano original.',
+          exp:'Esperar preserva a reserva e mantém sua capacidade de absorver imprevistos. O custo conhecido é R$ 1.000 e o tempo até a realização.'};}}
+     ]}],
+  st=>[
+    {tipo:'evento', ilu:'alerta', tag:'IMPREVISTO', titulo:'Um problema de saúde na família',
+     texto:'Um procedimento não coberto pelo plano exige <b>R$ 500</b> agora. Não há como adiar.',
+     opcoes:[{id:'A', titulo:'Pagar os R$ 500', detalhe:'R$ 500', custo:500, aplicar(st){
+        const bloq = st.flags.investBloqueado;
+        const f=pagar(st,500);
+        return {msg:'Valor pago: R$ 500. '+f.texto,
+          exp: bloq
+            ? 'Seu dinheiro aplicado com prazo não pôde ser resgatado. Ter patrimônio não é o mesmo que ter liquidez — e é a liquidez que resolve emergências.'
+            : 'Imprevistos não escolhem o mês. A diferença entre um susto e uma dívida costuma ser exatamente o tamanho da reserva disponível.'};}}]},
+    cenaTentacao('"Eu mereço": look + tênis',
+      'Você está economizando há meses e viu um look completo com tênis por <b>R$ 300</b>. A sensação de merecimento é real — o objetivo também.',
+      {titulo:'Levar só uma peça', detalhe:'R$ 120', valor:120})],
+  st=>[ eventoBonus(),
+    (st.flags.objetivoRealizado
+      ? {tipo:'decisao', ilu:'invest', tag:'DECISÃO FINAL', titulo:'Objetivo realizado: e agora?',
+         texto:'Seu projeto saiu do papel. A pergunta agora é o que fazer com a capacidade mensal que estava reservada para ele.',
+         opcoes:[
+          {id:'A', titulo:'Recompor a reserva de emergência', detalhe:'Guardar o disponível', aplicar(st){
+            const v=Math.max(0, r2(st.dinheiro*0.7)); st.dinheiro-=v; st.reserva+=v; sane();
+            return {msg:fmt(v)+' foram para a reserva de emergência.',
+              exp:'Depois de realizar um objetivo, reconstruir o colchão evita que a próxima surpresa vire dívida — e prepara o terreno para a próxima meta.'};}},
+          {id:'B', titulo:'Começar um novo objetivo investindo', detalhe:'Aplicar o disponível', aplicar(st){
+            const v=Math.max(0, r2(st.dinheiro*0.7)); st.dinheiro-=v; st.invest+=v; sane();
+            return {msg:fmt(v)+' foram para investimentos.',
+              exp:'Manter o hábito de aportar é o que diferencia uma conquista pontual de uma trajetória. Só cuide para que a emergência não dependa do que está aplicado.'};}},
+          {id:'C', titulo:'Aproveitar o momento', detalhe:'R$ 600 em consumo', custo:600, aplicar(st){
+            const f=pagar(st,600); st.flags.impulso=(st.flags.impulso||0)+1;
+            return {msg:'R$ 600 usados para comemorar. '+f.texto,
+              exp:'Celebrar conquistas sustenta a motivação. O ponto de atenção é o momento: comemorar com a reserva zerada devolve você ao ponto de partida.'};}}]}
+      : {tipo:'decisao', ilu:'trofeu', tag:'DECISÃO FINAL', titulo:'Realizar o projeto agora ou esperar',
+         texto:'O projeto custa <b>R$ 5.000</b>. Você tem hoje '+fmt(st.reserva+st.invest)+' entre reserva e investimentos, além de '+fmt(st.dinheiro)+' disponíveis.',
+         opcoes:[
+          {id:'A', titulo:'Realizar agora, custe o que custar', detalhe:'R$ 5.000', custo:5000, aplicar(st){
+            const f=pagar(st,5000); st.flags.objetivoRealizado=true;
+            return {msg:'Projeto realizado por R$ 5.000. '+f.texto,
+              exp:'Chegar ao objetivo é uma conquista real. Verifique de onde saiu o dinheiro: se parte veio de crédito, o projeto continuará sendo pago depois de pronto.'};}},
+          {id:'B', titulo:'Realizar parte agora e o resto depois', detalhe:'R$ 2.500 agora', custo:2500, aplicar(st){
+            const f=pagar(st,2500); st.flags.projetoParcial=true;
+            return {msg:'Você executou metade do projeto: R$ 2.500. '+f.texto,
+              exp:'Dividir a realização em etapas mantém parte da segurança e transforma um objetivo grande em entregas possíveis.'};}},
+          {id:'C', titulo:'Esperar e preservar a reserva', detalhe:'Sem gasto', aplicar(st){
+            st.flags.esperouFinal=true;
+            return {msg:'Você decidiu esperar mais um pouco e manter tudo guardado.',
+              exp:'Adiar a realização preserva a sua capacidade de absorver imprevistos. Objetivo alcançado com reserva intacta dura mais do que objetivo alcançado no limite.'};}}]})]
+]
+};
+
+/* =====================================================================================
+   3) RENDERIZAÇÃO
+   ===================================================================================== */
+let hudAnterior = {};
+
+function telaInicio(){
+  const temSave = !!localStorage.getItem(SAVE_KEY);
+  app.innerHTML = `
+  <div class="hero fade">
+    <span class="kicker">SIMULAÇÃO DE EDUCAÇÃO FINANCEIRA</span>
+    <h1>DECI<span>SÕES</span></h1>
+    <div class="heroart up">${ILU.capa}</div>
+    <p class="sub">Você assume a vida financeira de um personagem e administra <b>R$ 2.000 por mês durante 6 meses</b>. Cada escolha muda o que será possível no mês seguinte.</p>
+    <p class="frase">"As decisões de hoje alteram as possibilidades de amanhã."</p>
+    <div class="pills">
+      <span class="pill">4 perfis</span><span class="pill">6 meses</span>
+      <span class="pill">Consequências acumuladas</span><span class="pill">15–25 min</span>
+    </div>
+    <div style="margin-top:28px;display:flex;flex-direction:column;align-items:center;gap:12px">
+      <button class="btn lg" id="go">COMEÇAR JORNADA</button>
+      ${temSave?`<button class="btn lg dark" id="cont">CONTINUAR JORNADA SALVA</button>`:''}
+    </div>
+  </div>`;
+  document.getElementById('go').onclick = ()=>{ limparSave(); telaPerfis(); };
+  const c=document.getElementById('cont');
+  if(c) c.onclick = ()=>{
+    try{
+      const s=JSON.parse(localStorage.getItem(SAVE_KEY));
+      if(s && s.perfilId){ state=s; if(state.mes>CONFIG.meses){ telaFinal(); } else { iniciarMes(); } }
+    }catch(e){ telaPerfis(); }
+  };
+}
+
+function telaPerfis(){
+  const cards = Object.values(CONFIG.perfis).map(p=>`
+    <div class="perfil up" style="border-top-color:${p.cor}">
+      <div class="top"><span class="ava" style="width:70px;height:70px;display:block">${ILU[p.ava]}</span>
+        <div><div class="tag" style="color:${p.cor}">${p.tag}</div><h3>${p.nome}</h3></div></div>
+      <div class="desc">${p.desc}</div>
+      <div class="nums">
+        <div><span class="mut">Renda mensal</span><b>${fmt(CONFIG.renda)}${p.vr?' + VR '+fmt(p.vr):''}</b></div>
+        <div><span class="mut">Saldo inicial</span><b>${fmt(p.dinheiro)}</b></div>
+        <div><span class="mut">Reserva</span><b>${fmt(p.reserva)}</b></div>
+        <div><span class="mut">Dívida</span><b style="color:${p.divida>0?'var(--verm)':'inherit'}">${fmt(p.divida)}</b></div>
+        <div><span class="mut">Despesas fixas</span><b>${fmt(p.despesas.reduce((a,d)=>a+d.valor,0))}</b></div>
+      </div>
+      <div class="goal"><b>🎯 Objetivo:</b> ${p.objetivo.label}<br><span class="mut">Desafio: ${p.desafio}</span></div>
+      <div class="act"><button class="btn" data-p="${p.id}">ESCOLHER PERFIL</button></div>
+    </div>`).join('');
+  app.innerHTML = `
+    <div class="sechead fade"><h2>Escolha o seu perfil</h2><p>Cada perfil começa com uma situação diferente. A renda é a mesma; as possibilidades, não.</p></div>
+    <div class="grid">${cards}</div>
+    <div class="center" style="margin-top:22px"><button class="btn ghost" id="voltar" style="background:rgba(255,255,255,.08);color:#cfe0f8;border-color:rgba(255,255,255,.18)">← Voltar</button></div>`;
+  app.querySelectorAll('[data-p]').forEach(b=> b.onclick=()=>{ state=novoEstado(b.dataset.p); iniciarMes(); });
+  document.getElementById('voltar').onclick = telaInicio;
+}
+
+function hudHTML(){
+  const st=state, p=perfil(), prog=progressoObjetivo(st);
+  const dots = CONFIG.mesesInfo.map(m=>`<i class="${m.n<st.mes?'on':(m.n===st.mes?'now':'')}"></i>`).join('');
+  const pm = parcelasMensais(st), cf = compromissosFuturos(st);
+  const f = k => (hudAnterior[k]!==undefined && hudAnterior[k]!==st[k]) ? ' flash':'';
+  const html = `
+  <div class="hud">
+    <div class="l1"><div class="mes">MÊS ${st.mes} DE ${CONFIG.meses} — ${CONFIG.mesesInfo[st.mes-1].titulo}</div>
+      <div class="pf">${p.nome}</div></div>
+    <div class="dots">${dots}</div>
+    <div class="chips">
+      <div class="chip${f('dinheiro')}"><div class="k">💰 Disponível</div><div class="v">${fmt(st.dinheiro)}</div></div>
+      <div class="chip g${f('reserva')}"><div class="k">🏦 Reserva</div><div class="v">${fmt(st.reserva)}</div></div>
+      <div class="chip ${st.divida>0?'r':''}${f('divida')}"><div class="k">💳 Dívida</div><div class="v">${fmt(st.divida)}</div></div>
+      <div class="chip"><div class="k">🎯 Objetivo</div><div class="v">${Math.round(prog*100)}%</div>
+        <div class="bar"><b style="width:${Math.round(prog*100)}%"></b></div></div>
+    </div>
+    <div class="extra">
+      ${st.invest>0?`<span>📈 Investimentos: <b>${fmt(st.invest)}</b></span>`:''}
+      ${pm>0?`<span>📆 Parcelas: <b>${fmt(pm)}/mês</b> (${fmt(cf)} a pagar)</span>`:''}
+      ${p.vr?`<span>🍽️ VR: <b>${fmt(st.vr)}</b></span>`:''}
+      <span>📋 Custo fixo: <b>${fmt(despesasFixas(st))}/mês</b></span>
+    </div>
+  </div>`;
+  hudAnterior = {dinheiro:st.dinheiro, reserva:st.reserva, divida:st.divida, invest:st.invest};
+  return html;
+}
+const desenhar = html => { app.innerHTML = hudHTML() + html; window.scrollTo({top:0,behavior:'smooth'}); };
+
+/* ---------- ciclo do mês ---------- */
+function iniciarMes(){
+  processarMes();
+  const cenas = ROTEIRO[state.perfilId][state.mes-1](state);
+  state.cenas = [{tipo:'abertura'}].concat(cenas).concat([{tipo:'fechamento'}]);
+  state.cenaIdx = 0;
+  salvar();
+  renderCena();
+}
+function proximaCena(){ state.cenaIdx++; renderCena(); }
+function renderCena(){
+  const c = state.cenas[state.cenaIdx];
+  if(!c){ fecharMes(); return; }
+  if(c.tipo==='abertura')     return cenaAbertura();
+  if(c.tipo==='consequencia') return cenaConsequencia(c);
+  if(c.tipo==='fechamento')   return cenaFechamento();
+  return cenaDecisao(c);
+}
+
+function cenaAbertura(){
+  const st=state, info=CONFIG.mesesInfo[st.mes-1];
+  const itens = st.extrato.map(e=>`<div class="it"><span>${e.l}</span><b class="${e.c}">${e.t}</b></div>`).join('');
+  desenhar(`
+  <div class="card scene up">
+    <div class="ilubox">${ILU.cofre}</div>
+    <span class="tag">MÊS ${st.mes} — ${info.tema}</span>
+    <h2>${info.titulo}</h2>
+    <p class="txt">${st.mes===1
+      ? 'Sua renda entrou e as obrigações do mês já foram descontadas. O que aparece abaixo é o ponto de partida das suas decisões.'
+      : 'Um novo mês começou. Antes de qualquer decisão, veja o que os meses anteriores já reservaram para este.'}</p>
+    <div class="extrato">
+      <div class="h">MOVIMENTAÇÃO AUTOMÁTICA DO MÊS</div>
+      ${itens}
+      <div class="tot"><span>Dinheiro disponível para decidir</span><span>${fmt(st.dinheiro)}</span></div>
+    </div>
+    <div class="acts"><button class="btn" id="next">CONTINUAR →</button></div>
+  </div>`);
+  document.getElementById('next').onclick = proximaCena;
+}
+
+let selecionada = null;
+function snapshotFinanceiro(st){
+  return {
+    dinheiro:r2(st.dinheiro), reserva:r2(st.reserva), invest:r2(st.invest),
+    divida:r2(st.divida), parcelas:r2(parcelasMensais(st)), patrimonio:r2(patrimonio(st))
+  };
+}
+function cenaDecisao(c){
+  selecionada = null;
+  const opts = c.opcoes.map((o,i)=>{
+    let aviso='';
+    if(o.custo){
+      const liquido = state.dinheiro + state.reserva + (state.flags.investBloqueado?0:state.invest);
+      if(o.custo > liquido) aviso = `<span class="warn red">Pode exigir crédito</span>`;
+      else if(o.custo > state.dinheiro) aviso = `<span class="warn">Pode usar reserva</span>`;
+    }
+    return `<button class="opt" data-i="${i}">
+      <span class="letra">${o.id||String.fromCharCode(65+i)}</span>
+      <span><div class="tt">${o.titulo}</div><div class="dd">${o.detalhe||''}</div>${aviso}</span>
+    </button>`;
+  }).join('');
+  const tagClass = /IMPREVISTO|CONSEQUÊNCIA|ACONTECEU/.test(c.tag||'') ? ' ev' : (/ALERTA/.test(c.tag||'')?' al':'');
+  desenhar(`<div class="card scene up">
+    <div class="ilubox">${ILU[c.ilu]||ILU.cofre}</div>
+    <span class="tag${tagClass}">${c.tag||'DECISÃO'}</span>
+    <h2>${c.titulo}</h2>
+    <p class="txt">${c.texto||''}</p>
+    <div class="opts">${opts}</div>
+    <div class="acts"><button class="btn" id="confirm" disabled>CONFIRMAR DECISÃO</button></div>
+  </div>`);
+  const botoes=[...app.querySelectorAll('.opt')];
+  const confirmar=document.getElementById('confirm');
+  botoes.forEach((b,i)=>b.onclick=()=>{
+    // O jogador pode trocar de alternativa livremente até confirmar.
+    botoes.forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+    selecionada=i;
+    confirmar.disabled=false;
+  });
+  confirmar.onclick=()=>{
+    if(selecionada===null) return;
+    confirmar.disabled=true;
+    botoes.forEach((b,i)=>{ if(i!==selecionada)b.classList.add('off'); });
+    const o=c.opcoes[selecionada];
+    const antes=snapshotFinanceiro(state);
+    let ret={msg:'Decisão registrada.',exp:''};
+    try{ ret=o.aplicar?o.aplicar(state)||ret:ret; }catch(err){
+      console.error(err); ret={msg:'A decisão foi registrada, mas ocorreu um erro ao aplicar o efeito.',exp:'O restante da jornada continuará normalmente.'};
+    }
+    sane();
+    const depois=snapshotFinanceiro(state);
+    state.historico.push({mes:state.mes,titulo:c.titulo,escolha:o.titulo,antes,depois,exp:ret.exp||''});
+    salvar();
+    state.cenas.splice(state.cenaIdx+1,0,{tipo:'consequencia',titulo:c.titulo,escolha:o.titulo,msg:ret.msg||'',exp:ret.exp||'',antes,depois,ilu:c.ilu});
+    proximaCena();
+  };
+}
+
+function cenaConsequencia(c){
+  const a=c.antes,d=c.depois;
+  const deltas=[];
+  [['Dinheiro disponível','dinheiro'],['Reserva','reserva'],['Investimentos','invest'],['Dívida','divida']].forEach(([nome,k])=>{
+    const v=r2(d[k]-a[k]);
+    if(Math.abs(v)>=0.01) deltas.push(`<div class="delta"><span>${nome}</span><b class="${v>=0?'pos':'neg'}">${sgn(v)}</b></div>`);
+  });
+  const pdelta=r2(d.parcelas-a.parcelas);
+  if(Math.abs(pdelta)>=0.01) deltas.push(`<div class="delta"><span>Parcelas mensais</span><b class="${pdelta>=0?'neg':'pos'}">${sgn(pdelta)}</b></div>`);
+  desenhar(`<div class="card scene up">
+    <div class="ilubox">${ILU[c.ilu]||ILU.cofre}</div>
+    <span class="tag">CONSEQUÊNCIA</span>
+    <h2>${c.escolha}</h2>
+    <p class="txt">${c.msg}</p>
+    <div class="conseq">
+      <div class="snap"><div class="k">PATRIMÔNIO ANTES</div><div class="v">${fmt(a.patrimonio)}</div></div>
+      <div class="arrow">→</div>
+      <div class="snap after"><div class="k">PATRIMÔNIO DEPOIS</div><div class="v">${fmt(d.patrimonio)}</div></div>
+    </div>
+    ${deltas.length?`<div class="deltas">${deltas.join('')}</div>`:''}
+    ${c.exp?`<div class="lesson"><div class="k">POR TRÁS DA SUA DECISÃO</div><p>${c.exp}</p></div>`:''}
+    <div class="acts"><button class="btn" id="next">CONTINUAR →</button></div>
+  </div>`);
+  document.getElementById('next').onclick=proximaCena;
+}
+
+function cenaFechamento(){
+  const st=state;
+  // Snapshot da tela: permite experimentar distribuições e voltar atrás antes de fechar o mês.
+  const inicial = {
+    dinheiro:r2(st.dinheiro), reserva:r2(st.reserva), invest:r2(st.invest), divida:r2(st.divida)
+  };
+  const movimentos=[];
+
+  desenhar(`<div class="card scene up">
+    <span class="tag">FECHAMENTO DO MÊS</span>
+    <h2>Como você quer organizar o dinheiro que restou?</h2>
+    <p class="txt">Antes de encerrar o mês, você pode distribuir parte do valor disponível. <b>Nada é definitivo até você fechar o mês:</b> experimente e, se mudar de ideia, use “Desfazer” ou “Restaurar valores”.</p>
+    <div class="alloc">
+      <div class="pot"><div class="k">💰 DISPONÍVEL</div><div class="v" id="pv-d">${fmt(st.dinheiro)}</div><div class="mut" style="font-size:.72rem;margin-top:5px">Fica livre para o próximo mês</div></div>
+      <div class="pot"><div class="k">🏦 RESERVA</div><div class="v" id="pv-r">${fmt(st.reserva)}</div><div class="mut" style="font-size:.72rem;margin-top:5px">Proteção para imprevistos</div></div>
+      <div class="pot"><div class="k">📈 INVESTIMENTOS</div><div class="v" id="pv-i">${fmt(st.invest)}</div><div class="mut" style="font-size:.72rem;margin-top:5px">Aplicado para render; pode ter menos liquidez</div></div>
+      <div class="pot"><div class="k">💳 DÍVIDA</div><div class="v" id="pv-v">${fmt(st.divida)}</div><div class="mut" style="font-size:.72rem;margin-top:5px">Valor que ainda precisa ser pago</div></div>
+    </div>
+
+    <div class="lesson" style="margin-bottom:16px">
+      <div class="k">COMO FUNCIONA?</div>
+      <p><b>Disponível</b> fica acessível para o próximo mês. <b>Reserva</b> é o dinheiro separado para proteção. <b>Investimentos</b> representam dinheiro aplicado buscando rendimento — não é “dinheiro extra” e pode ter menos acesso imediato dependendo da aplicação.</p>
+    </div>
+
+    <div class="mover">
+      <div class="spread" style="margin-bottom:8px"><div><b>Escolha um valor</b><div class="mut" style="font-size:.82rem">Você pode fazer mais de uma movimentação.</div></div><div class="mut" id="limiteMover">Máximo: ${fmt(Math.max(0,st.dinheiro))}</div></div>
+      <input id="valorMover" inputmode="decimal" value="${Math.max(0,r2(st.dinheiro*0.5)).toFixed(2)}" aria-label="Valor para mover">
+      <div class="quick"><button data-q="0.25">25%</button><button data-q="0.5">50%</button><button data-q="1">100%</button></div>
+      <div class="dest">
+        <button data-d="reserva">🏦 Colocar na reserva</button>
+        <button data-d="invest">📈 Aplicar em investimento</button>
+        ${st.divida>0.01?'<button data-d="divida">💳 Abater dívida</button>':''}
+        <button data-d="manter">💰 Manter disponível</button>
+      </div>
+      <div class="hist" id="movMsg">Nenhuma movimentação feita nesta tela.</div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn ghost" id="undoMov" disabled>↶ Desfazer última</button>
+        <button class="btn ghost" id="resetMov" disabled>↺ Restaurar valores</button>
+      </div>
+    </div>
+    <div class="acts"><button class="btn" id="fechar">${st.mes<CONFIG.meses?'FECHAR MÊS E CONTINUAR →':'FINALIZAR JORNADA →'}</button></div>
+  </div>`);
+
+  const inp=document.getElementById('valorMover');
+  const msg=document.getElementById('movMsg');
+  const undo=document.getElementById('undoMov');
+  const reset=document.getElementById('resetMov');
+  const atualizar=()=>{
+    document.getElementById('pv-d').textContent=fmt(st.dinheiro);
+    document.getElementById('pv-r').textContent=fmt(st.reserva);
+    document.getElementById('pv-i').textContent=fmt(st.invest);
+    document.getElementById('pv-v').textContent=fmt(st.divida);
+    document.getElementById('limiteMover').textContent='Máximo: '+fmt(Math.max(0,st.dinheiro));
+    undo.disabled=movimentos.length===0;
+    reset.disabled=movimentos.length===0;
+  };
+  const snapshot=()=>({dinheiro:r2(st.dinheiro),reserva:r2(st.reserva),invest:r2(st.invest),divida:r2(st.divida)});
+  const restaurar=(x)=>{ st.dinheiro=x.dinheiro; st.reserva=x.reserva; st.invest=x.invest; st.divida=x.divida; sane(); atualizar(); salvar(); };
+
+  app.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{
+    inp.value=r2(Math.max(0,st.dinheiro)*Number(b.dataset.q)).toFixed(2);
+  });
+
+  app.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{
+    const dest=b.dataset.d;
+    if(dest==='manter'){
+      msg.textContent='Tudo certo: o valor que permanecer em “Disponível” seguirá livre para o próximo mês.';
+      return;
+    }
+    let v=Number(String(inp.value).replace(',','.'));
+    if(!Number.isFinite(v)||v<=0){ msg.textContent='Digite um valor maior que zero.'; return; }
+    if(v>st.dinheiro+0.005){ msg.textContent='Esse valor é maior do que o dinheiro disponível. Ajuste o valor antes de continuar.'; return; }
+    v=r2(v);
+    const antes=snapshot();
+    st.dinheiro-=v;
+    let texto='';
+    if(dest==='reserva'){
+      st.reserva+=v;
+      texto=`${fmt(v)} foram separados na reserva.`;
+    }
+    if(dest==='invest'){
+      st.invest+=v;
+      texto=`${fmt(v)} foram aplicados em investimentos. Esse valor continua sendo seu, mas agora está separado do dinheiro disponível.`;
+    }
+    if(dest==='divida'){
+      const abat=Math.min(v,st.divida); st.divida-=abat; const sobra=r2(v-abat); st.dinheiro+=sobra;
+      texto=`${fmt(abat)} foram usados para reduzir a dívida.`+(sobra>0?` ${fmt(sobra)} voltaram ao disponível porque a dívida foi totalmente quitada.`:'');
+    }
+    sane();
+    movimentos.push({antes,texto});
+    atualizar(); salvar();
+    msg.textContent=texto+' Você ainda pode mudar de ideia antes de fechar o mês.';
+    inp.value=r2(Math.max(0,st.dinheiro)*0.5).toFixed(2);
+  });
+
+  undo.onclick=()=>{
+    if(!movimentos.length) return;
+    const mov=movimentos.pop();
+    restaurar(mov.antes);
+    msg.textContent=movimentos.length ? 'Última movimentação desfeita. As anteriores foram mantidas.' : 'Movimentação desfeita. Você voltou aos valores do início desta tela.';
+    inp.value=r2(Math.max(0,st.dinheiro)*0.5).toFixed(2);
+  };
+
+  reset.onclick=()=>{
+    restaurar(inicial);
+    movimentos.length=0;
+    atualizar();
+    msg.textContent='Valores restaurados. Você pode escolher uma nova distribuição do zero.';
+    inp.value=r2(Math.max(0,st.dinheiro)*0.5).toFixed(2);
+  };
+
+  atualizar();
+  document.getElementById('fechar').onclick=fecharMes;
+}
+function fecharMes(){
+  const st=state;
+  st.serie.push({mes:st.mes,reserva:st.reserva,invest:st.invest,dinheiro:st.dinheiro,divida:st.divida,patrimonio:patrimonio(st)});
+  if(st.mes>=CONFIG.meses){ st.mes=CONFIG.meses+1; salvar(); return telaFinal(); }
+  st.mes++; salvar(); iniciarMes();
+}
+
+function indiceSaude(st){
+  const renda=CONFIG.renda;
+  const reservaMeses = custoMensalTotal(st)>0 ? (st.reserva/custoMensalTotal(st)) : 3;
+  const protecao=clamp(reservaMeses/3,0,1);
+  const endiv=clamp(1-(st.divida/(renda*2.5)),0,1);
+  const comprom=clamp(1-(parcelasMensais(st)/renda),0,1);
+  const objetivo=progressoObjetivo(st);
+  const patrimonioScore=clamp((patrimonio(st)+renda)/(renda*4),0,1);
+  let score=Math.round((protecao*.24+endiv*.24+comprom*.18+objetivo*.20+patrimonioScore*.14)*100);
+  score-=Math.min(15,(st.flags.impulso||0)*3);
+  score-=Math.min(15,(st.flags.mesNegativo||0)*5);
+  return clamp(score,0,100);
+}
+function diagnostico(st,score){
+  if(st.divida>CONFIG.renda || parcelasMensais(st)>CONFIG.renda*.35 || score<40)
+    return {nome:'ENDIVIDADO',cor:'linear-gradient(135deg,#b91c1c,#ef4444)',texto:'Seus compromissos cresceram além da sua margem atual. A prioridade agora é recuperar espaço no orçamento e reduzir o custo das dívidas.'};
+  if((st.flags.impulso||0)>=3 || score<60)
+    return {nome:'IMPULSIVO',cor:'linear-gradient(135deg,#c2410c,#f59e0b)',texto:'Você priorizou várias decisões imediatas. Algumas foram possíveis, mas reduziram sua liberdade financeira nos meses seguintes.'};
+  if(score<80)
+    return {nome:'EQUILIBRISTA',cor:'linear-gradient(135deg,#a16207,#eab308)',texto:'Você conseguiu conciliar consumo, segurança e objetivos, embora algumas escolhas tenham criado pontos de atenção.'};
+  return {nome:'PLANEJADOR',cor:'linear-gradient(135deg,#047857,#10b981)',texto:'Você demonstrou consistência, preservou margem para imprevistos e tomou decisões alinhadas ao contexto financeiro.'};
+}
+function telaFinal(){
+  const st=state,p=perfil(),score=indiceSaude(st),diag=diagnostico(st,score),prog=Math.round(progressoObjetivo(st)*100);
+  const cf=compromissosFuturos(st), pm=parcelasMensais(st);
+  const pontos=[];
+  if(st.flags.usouReserva) pontos.push('🏦 Sua reserva foi acionada em algum momento da jornada. Isso mostra como proteção financeira muda as alternativas disponíveis.');
+  if((st.flags.parcelou||0)>0) pontos.push(`📆 Você assumiu ${st.flags.parcelou} parcelamento(s). Ao final, ainda há ${fmt(cf)} em compromissos futuros.`);
+  if((st.flags.impulso||0)>0) pontos.push(`🛍️ Você registrou ${st.flags.impulso} decisão(ões) de consumo por impulso ou crédito para desejo.`);
+  if(st.flags.rendaExtra) pontos.push('💼 Você aproveitou uma oportunidade de renda extra durante a jornada.');
+  if(st.divida<=0.01 && p.id==='p3') pontos.push('✅ Você encerrou a jornada sem saldo de dívida original.');
+  if(!pontos.length) pontos.push('📌 Sua trajetória foi relativamente estável. O principal aprendizado está no equilíbrio entre liquidez, objetivo e liberdade de escolha.');
+  const hist=st.historico.slice(-8).map((h,i)=>`<button data-h="${i}"><b>Mês ${h.mes}: ${esc(h.escolha)}</b><small>${esc(h.titulo)}</small></button>`).join('');
+  app.innerHTML=`
+    <div class="final-hero fade"><h2>SUA JORNADA</h2><p>6 meses concluídos — ${p.nome}</p></div>
+    <div class="res up">
+      <div class="b"><div class="k">💰 DISPONÍVEL</div><div class="v">${fmt(st.dinheiro)}</div></div>
+      <div class="b"><div class="k">🏦 RESERVA</div><div class="v">${fmt(st.reserva)}</div></div>
+      <div class="b"><div class="k">📈 INVESTIMENTOS</div><div class="v">${fmt(st.invest)}</div></div>
+      <div class="b"><div class="k">💳 DÍVIDAS</div><div class="v">${fmt(st.divida)}</div></div>
+      <div class="b"><div class="k">📆 PARCELAS</div><div class="v">${fmt(pm)}/mês</div></div>
+      <div class="b"><div class="k">🎯 OBJETIVO</div><div class="v">${prog}%</div></div>
+    </div>
+    <div class="diag up" style="background:${diag.cor}">
+      <div class="k">SEU PERFIL FINANCEIRO</div><h3>${diag.nome}</h3><p>${diag.texto}</p>
+      <div class="score"><div class="n">${score}</div><div><div style="font-size:.75rem;margin-bottom:6px">ÍNDICE DE SAÚDE FINANCEIRA</div><div class="bar"><b style="width:${score}%"></b></div></div></div>
+    </div>
+    <div class="card up"><h3 style="margin-bottom:12px">O que sua jornada mostrou?</h3><div class="pontos">${pontos.map(x=>`<div class="ponto">${x}</div>`).join('')}</div></div>
+    <div class="card up" style="margin-top:18px"><h3>Se pudesse voltar, qual decisão você mudaria?</h3>
+      <p class="mut">Escolha uma das decisões recentes para refletir sobre o efeito acumulado.</p><div class="chips2">${hist}</div>
+      <div class="lesson" id="reflexao" style="display:none"><div class="k">REFLEXÃO</div><p></p></div>
+    </div>
+    <div class="card up" style="margin-top:18px;text-align:center"><p><b>Não existe uma única forma de cuidar do seu dinheiro.</b><br>O importante é entender suas escolhas, conhecer suas consequências e tomar decisões alinhadas à realidade que você deseja construir.</p>
+      <button class="btn lg" id="again">JOGAR NOVAMENTE</button></div>`;
+  const rec=st.historico.slice(-8);
+  app.querySelectorAll('[data-h]').forEach((b,i)=>b.onclick=()=>{
+    app.querySelectorAll('[data-h]').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
+    const h=rec[i], box=document.getElementById('reflexao'); box.style.display='block';
+    box.querySelector('p').textContent=`Você escolheu “${h.escolha}”. ${h.exp||'Uma escolha diferente mudaria o dinheiro, os compromissos ou as alternativas disponíveis nos meses seguintes.'}`;
+  });
+  document.getElementById('again').onclick=()=>{limparSave();state=null;hudAnterior={};telaPerfis();};
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- inicialização ---------- */
+telaInicio();
+</script>
+</body>
+</html>
