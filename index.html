@@ -1441,5 +1441,24 @@ telaInicio();
     &copy; 2026 Maria Monte — Projeto Educação Financeira.<br>
     Todos os direitos reservados. Proibida a reprodução ou distribuição não autorizada.
 </footer>
+  <script>
+  // Bloqueia o clique com o botão direito do mouse
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    alert('Conteúdo protegido por direitos autorais.');
+  });
+
+  // Bloqueia atalhos de teclado (F12, Ctrl+U, Ctrl+Shift+I)
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12') {
+      e.preventDefault();
+      return false;
+    }
+    if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || (e.shiftKey && (e.key === 'i' || e.key === 'I')))) {
+      e.preventDefault();
+      return false;
+    }
+  });
+</script>
 </body>
 </html>
